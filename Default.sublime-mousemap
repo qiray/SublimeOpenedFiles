@@ -1,0 +1,12 @@
+[
+{
+  "button": "button1", "count": 2,
+  "press_command": "mouseclick",
+  "press_args": {"command": "drag_select", "args": {"by": "words"}}
+},
+	{
+	"button": "button3", "count": 1, //TODO: use on mouse button1 single click
+	"press_command": "mouseclick",
+	"press_args": {"command": "drag_select", "args": {}}
+	},
+]

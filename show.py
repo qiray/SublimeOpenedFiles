@@ -9,16 +9,20 @@ from os.path import basename
 
 ST3 = int(sublime.version()) >= 3000
 
-# if ST3:
-#     from .common import first, set_proper_scheme
-#     SYNTAX_EXTENSION = '.sublime-syntax'
-# else:
-#     from common import first, set_proper_scheme
-#     SYNTAX_EXTENSION = '.hidden-tmLanguage'
+if ST3:
+    SYNTAX_EXTENSION = '.sublime-syntax'
+else:
+    SYNTAX_EXTENSION = '.hidden-tmLanguage'
 
 def first(seq, pred):
     '''similar to built-in any() but return the object instead of boolean'''
     return next((item for item in seq if pred(item)), None)
+
+def set_proper_scheme(view):
+    settings = sublime.load_settings('kate_documents.sublime-settings')
+    if view.settings().get('color_scheme') == settings.get('color_scheme'):
+        return
+    view.settings().set('color_scheme', settings.get('color_scheme'))
 
 def calc_width(view):
     '''
@@ -40,7 +44,7 @@ def calc_width(view):
     #                           u'Fallback to default 0.3 for now.' % type(width))
     #     width = 0.3
     # return width or 0.1  # avoid 0.0
-    return 0.3 #default value
+    return 0.2 #default value
 
 def get_group(groups, nag):
     '''
@@ -90,13 +94,13 @@ def set_view(view_id, window, ignore_existing, path, single_pane):
         # See if a view for this path already exists.
         same_path = lambda v: v.settings().get('dired_path') == path
         # See if any reusable view exists in case of single_pane argument
-        any_path = lambda v: v.score_selector(0, "text.dired") > 0
+        any_path = lambda v: v.score_selector(0, "text.kate_documents") > 0
         view = first(window.views(), any_path if single_pane else same_path)
 
     if not view:
         view = window.new_file()
-        # view.settings().add_on_change('color_scheme', lambda: set_proper_scheme(view))
-        # view.set_syntax_file('Packages/FileBrowser/dired' + SYNTAX_EXTENSION)
+        view.settings().add_on_change('color_scheme', lambda: set_proper_scheme(view))
+        view.set_syntax_file('Packages/KateDocuments/kate_documents' + SYNTAX_EXTENSION)
         view.set_scratch(True)
         reset_sels = True
     else:
@@ -105,14 +109,14 @@ def set_view(view_id, window, ignore_existing, path, single_pane):
     return (view, reset_sels)
 
 
-def show(window, path, view_id=None, ignore_existing=False, single_pane=False, goto='', other_group=''):
+def show(window, path, view_id=None, ignore_existing=False, single_pane=False, goto='', other_group=False):
     """
     Determines the correct view to use, creating one if necessary, and prepares it.
     """
     if other_group:
         prev_focus = window.active_view()
         # simulate 'toggle sidebar':
-        if prev_focus and 'dired' in prev_focus.scope_name(0):
+        if prev_focus and 'kate_documents' in prev_focus.scope_name(0):
             window.run_command('close_file')
             return
 
@@ -137,8 +141,7 @@ def show(window, path, view_id=None, ignore_existing=False, single_pane=False, g
         name = u"■ {0}".format(view_name)
 
     view.set_name(name)
-    # view.settings().set('dired_path', path)
-    # view.settings().set('dired_rename_mode', False)
+    view.settings().set('kate_documents_type', True)
 
     # forcibly shoot on_activated, because when view was created it didnot have any settings
     window.show_quick_panel(['a', 'b'], None)

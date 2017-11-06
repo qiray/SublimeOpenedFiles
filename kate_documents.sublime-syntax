@@ -1,0 +1,37 @@
+%YAML 1.2
+---
+name: kate_documents
+hidden: true
+file_extensions:
+  - kate_documents
+scope: text.kate_documents
+contexts:
+  main:
+    - match: '^(\s*)([▸▾] )([^\\/]*)(\\|/)?(.*)?$'
+      scope: kate_documents.item.directory
+      captures:
+        1: indent
+        2: punctuation.definition.directory.symbol.kate_documents
+        3: string.name.directory.kate_documents
+        4: punctuation.definition.directory.slash.kate_documents
+        5: string.error.kate_documents
+    - match: '^(\s*)(≡ )(\S.*?(\.[^\.\n]+)?)$'
+      scope: kate_documents.item.file
+      captures:
+        1: indent
+        2: punctuation.definition.file.symbol.kate_documents
+        3: string.name.file.kate_documents
+        4: string.name.file.extension.kate_documents
+    - match: '^⠤(\s*\[.+\]){0,1}$'
+      scope: kate_documents.item.parent_dir
+      captures:
+        1: punctuation.definition.rename_mode.kate_documents
+    - match: (\S(.+)?$)
+      push:
+        - meta_scope: header.kate_documents
+        - match: '^(—+)(\[RENAME MODE\]){0,1}(—*)\n'
+          captures:
+            1: punctuation.definition.separator.kate_documents
+            2: punctuation.definition.rename_mode.kate_documents
+            3: punctuation.definition.separator.kate_documents
+          pop: true
