@@ -12,6 +12,7 @@ VERSION_REVISION = 2
 
 ST3 = int(sublime.version()) >= 3000
 KATE_DOCUMENTS_VIEW = None
+result, maxtree, filenames = None, None, None
 
 if ST3:
     from .show import show
@@ -38,6 +39,15 @@ class KateDocumentsCommand(sublime_plugin.TextCommand): #view.run_command('kate_
         elif name is not None and name != '':
             result = name
         return result
+
+    @staticmethod
+    def get_prefix(filename, index, length):
+        # ▸ 
+        #TODO: use fold and unfold
+        if index == length - 1:
+            return '≡ '
+        else:
+            return '▾ '
 
     def get_path(self, view_list):
         filenames = []
@@ -67,14 +77,16 @@ class KateDocumentsCommand(sublime_plugin.TextCommand): #view.run_command('kate_
         result = ''
         lasttree = []
         for filename in filenames:
-            for i in range(0, len(filename)):
+            length = len(filename)
+            for i in range(0, length):
                 if len(lasttree) > i and lasttree[i] == filename[i]:
                     continue
-                result += self.separator*i + filename[i] + '\n'
+                result += self.separator*i + self.get_prefix(filename, i, length) + filename[i] + '\n'
             lasttree = filename
         return result, maxtree, filenames
 
     def run(self, edit):
+        global result, maxtree, filenames #TODO: use settings instead of global variables
         global KATE_DOCUMENTS_VIEW
         window = self.view.window()
         view_list = window.views()
@@ -91,15 +103,26 @@ class KateDocumentsCommand(sublime_plugin.TextCommand): #view.run_command('kate_
         window.focus_view(view)
 
 class TestCommand(sublime_plugin.TextCommand):
+    #TODO: add map for strings and their meanings - fold/unfold directory, open file etc.
     def run(self, edit):
-        print('TEST')
+        # print( self.view.substr(self.view.line(self.view.sel()[0])))
+        (row,col) = self.view.rowcol(self.view.sel()[0].begin())
+        curlinetext = self.view.substr(self.view.line(self.view.sel()[0]))
+        print('TEST ', row, col)
 
 # MOUSE ACTIONS #################################################
 
-def mouse_actions(view, args): #TODO: fix and use
+def mouse_click_actions(view, args): #TODO: fix and use
     s = view.settings()
     if s.get("kate_documents_type"):
-        view.run_command('test')
+        #call system mouse command before
+        system_command = args["command"] if "command" in args else None 
+        if system_command:
+            system_args = dict({"event": args["event"]}.items())
+            system_args.update(dict(args["args"].items()))
+            view.run_command(system_command, system_args)
+
+        view.run_command('test') #call user defined command
     else:
         system_command = args["command"] if "command" in args else None
         if system_command:
@@ -110,8 +133,8 @@ def mouse_actions(view, args): #TODO: fix and use
 if ST3:
     class MouseClickCommand(sublime_plugin.TextCommand):
         def run_(self, view, args):
-            mouse_actions(self.view, args)
+            mouse_click_actions(self.view, args)
 else:
     class MouseClickCommand(sublime_plugin.TextCommand):
         def run_(self, args):
-            mouse_actions(self.view, args)
+            mouse_click_actions(self.view, args)
