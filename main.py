@@ -94,7 +94,7 @@ class TestCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         print('TEST')
 
-# MOUSE INTERATIONS #################################################
+# MOUSE ACTIONS #################################################
 
 def mouse_actions(view, args): #TODO: fix and use
     s = view.settings()
