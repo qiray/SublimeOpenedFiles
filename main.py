@@ -12,7 +12,7 @@ VERSION_REVISION = 2
 
 ST3 = int(sublime.version()) >= 3000
 KATE_DOCUMENTS_VIEW = None
-result, maxtree, filenames = None, None, None
+result, maxtree, filenames = None, None, None #TODO: save these variables in settings
 
 if ST3:
     from .show import show
@@ -42,12 +42,11 @@ class KateDocumentsCommand(sublime_plugin.TextCommand): #view.run_command('kate_
 
     @staticmethod
     def get_prefix(filename, index, length):
-        # ▸ 
+        # ▸
         #TODO: use fold and unfold
         if index == length - 1:
-            return '≡ '
-        else:
-            return '▾ '
+            return '≡ ' 
+        return '▾ '
 
     def get_path(self, view_list):
         filenames = []
@@ -106,9 +105,17 @@ class TestCommand(sublime_plugin.TextCommand):
     #TODO: add map for strings and their meanings - fold/unfold directory, open file etc.
     def run(self, edit):
         # print( self.view.substr(self.view.line(self.view.sel()[0])))
-        (row,col) = self.view.rowcol(self.view.sel()[0].begin())
-        curlinetext = self.view.substr(self.view.line(self.view.sel()[0]))
-        print('TEST ', row, col)
+        (row, col) = self.view.rowcol(self.view.sel()[0].begin())
+        selection = self.view.sel()[0]
+        # curlinetext = self.view.substr(self.view.line(self.view.sel()[0]))
+        self.open_file(selection)
+
+    def open_file(self, selection): #TODO: make dict for saving full names for each strong of result (global variable)
+        window = self.view.window()
+        (row, col) = self.view.rowcol(selection.begin())
+        filename = self.view.substr(self.view.line(selection))
+        print(filename, '!', row, col)
+        # window.openFile()
 
 # MOUSE ACTIONS #################################################
 
