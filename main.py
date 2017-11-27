@@ -117,7 +117,7 @@ class TestCommand(sublime_plugin.TextCommand):
         print(filename, '!', row, col)
         # window.openFile()
 
-# MOUSE ACTIONS #################################################
+# MOUSE ACTIONS ##############################################
 
 def mouse_click_actions(view, args): #TODO: fix and use
     s = view.settings()
