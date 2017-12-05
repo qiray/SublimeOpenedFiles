@@ -8,11 +8,12 @@ import sublime_plugin
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 0
-VERSION_REVISION = 2
+VERSION_REVISION = 3
 
 ST3 = int(sublime.version()) >= 3000
 KATE_DOCUMENTS_VIEW = None
 result, maxtree, filenames = None, None, None #TODO: save these variables in settings
+actionsMap = {}
 
 if ST3:
     from .show import show
@@ -49,6 +50,7 @@ class KateDocumentsCommand(sublime_plugin.TextCommand): #view.run_command('kate_
         return '▾ '
 
     def get_path(self, view_list):
+        global actionsMap
         filenames = []
         maxtree = []
         is_shorten = False
@@ -75,12 +77,16 @@ class KateDocumentsCommand(sublime_plugin.TextCommand): #view.run_command('kate_
         debug(5, filenames)
         result = ''
         lasttree = []
+        count = 0
         for filename in filenames:
             length = len(filename)
             for i in range(0, length):
                 if len(lasttree) > i and lasttree[i] == filename[i]:
                     continue
                 result += self.separator*i + self.get_prefix(filename, i, length) + filename[i] + '\n'
+                count += 1
+            actionsMap[count - 1] = os.sep.join(maxtree) + os.sep + os.sep.join(filename)
+            
             lasttree = filename
         return result, maxtree, filenames
 
@@ -89,6 +95,18 @@ class KateDocumentsCommand(sublime_plugin.TextCommand): #view.run_command('kate_
         global KATE_DOCUMENTS_VIEW
         window = self.view.window()
         view_list = window.views()
+
+        temp = []
+        for view in view_list:
+            s = view.settings()
+            if s.get("kate_documents_type"):
+                KATE_DOCUMENTS_VIEW = view.id()
+            elif s.get('dired_path'):
+                pass
+            else:
+                temp.append(view)
+        view_list = temp
+
         result, maxtree, filenames = self.get_path(view_list)
 
         #From ST FileBrowser
@@ -99,37 +117,34 @@ class KateDocumentsCommand(sublime_plugin.TextCommand): #view.run_command('kate_
         KATE_DOCUMENTS_VIEW = view.id()
         view.erase(edit, sublime.Region(0, view.size())) #clear view content
         view.insert(edit, 0, result) #paste result string
-        window.focus_view(view)
+        # window.focus_view(view)
 
-class TestCommand(sublime_plugin.TextCommand):
+class KateDocumentsOpenCommand(sublime_plugin.TextCommand):
     #TODO: add map for strings and their meanings - fold/unfold directory, open file etc.
     def run(self, edit):
-        # print( self.view.substr(self.view.line(self.view.sel()[0])))
         (row, col) = self.view.rowcol(self.view.sel()[0].begin())
         selection = self.view.sel()[0]
-        # curlinetext = self.view.substr(self.view.line(self.view.sel()[0]))
         self.open_file(selection)
 
-    def open_file(self, selection): #TODO: make dict for saving full names for each strong of result (global variable)
+    def open_file(self, selection): #TODO: make dict for saving full names for each string of result (global variable)
         window = self.view.window()
         (row, col) = self.view.rowcol(selection.begin())
         filename = self.view.substr(self.view.line(selection))
-        print(filename, '!', row, col)
-        # window.openFile()
+        if row in actionsMap:
+            window.open_file(actionsMap[row])
 
 # MOUSE ACTIONS ##############################################
 
 def mouse_click_actions(view, args): #TODO: fix and use
     s = view.settings()
     if s.get("kate_documents_type"):
-        #call system mouse command before
-        system_command = args["command"] if "command" in args else None 
-        if system_command:
-            system_args = dict({"event": args["event"]}.items())
-            system_args.update(dict(args["args"].items()))
-            view.run_command(system_command, system_args)
-
-        view.run_command('test') #call user defined command
+        view.run_command('kate_documents_open') #call user defined command
+    elif s.get("dired_path") and not s.get("dired_rename_mode"): #for FileBrowser plugin
+        if 'directory' in view.scope_name(view.sel()[0].a):
+            command = ("dired_expand", {"toggle": True})
+        else:
+            command = ("dired_select", {"other_group": True})
+        view.run_command(*command)
     else:
         system_command = args["command"] if "command" in args else None
         if system_command:
@@ -138,10 +153,21 @@ def mouse_click_actions(view, args): #TODO: fix and use
             view.run_command(system_command, system_args)
 
 if ST3:
-    class MouseClickCommand(sublime_plugin.TextCommand):
+    class MouseDoubleclickCommand(sublime_plugin.TextCommand):
         def run_(self, view, args):
             mouse_click_actions(self.view, args)
 else:
-    class MouseClickCommand(sublime_plugin.TextCommand):
+    class MouseDoubleclickCommand(sublime_plugin.TextCommand):
         def run_(self, args):
             mouse_click_actions(self.view, args)
+
+#TODO: add event listener for open/close/new tabs
+# class SampleListener(sublime_plugin.EventListener):
+#     def on_load(self, view):
+#         view.run_command('kate_documents')
+
+#     def on_pre_close(self, view):
+#         print('Closing!' + view.name())
+#         s = view.settings()`
+#         if not s.get("kate_documents_type"):
+#             view.run_command('kate_documents')
