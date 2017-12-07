@@ -22,16 +22,3 @@ contexts:
         2: punctuation.definition.file.symbol.kate_documents
         3: string.name.file.kate_documents
         4: string.name.file.extension.kate_documents
-    - match: '^⠤(\s*\[.+\]){0,1}$'
-      scope: kate_documents.item.parent_dir
-      captures:
-        1: punctuation.definition.rename_mode.kate_documents
-    - match: (\S(.+)?$)
-      push:
-        - meta_scope: header.kate_documents
-        - match: '^(—+)(\[RENAME MODE\]){0,1}(—*)\n'
-          captures:
-            1: punctuation.definition.separator.kate_documents
-            2: punctuation.definition.rename_mode.kate_documents
-            3: punctuation.definition.separator.kate_documents
-          pop: true

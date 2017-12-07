@@ -40,7 +40,7 @@
 			<key>name</key>
 			<string>Project Symbols > Star</string>
 			<key>scope</key>
-			<string>punctuation.definition.projects.star.symbol.dired</string>
+			<string>punctuation.definition.projects.star.symbol.kate_documents</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -51,7 +51,7 @@
 			<key>name</key>
 			<string>Project Symbols > Chevron</string>
 			<key>scope</key>
-			<string>punctuation.definition.projects.chevron.symbol.dired</string>
+			<string>punctuation.definition.projects.chevron.symbol.kate_documents</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -63,7 +63,7 @@
 			<key>name</key>
 			<string>Project Path</string>
 			<key>scope</key>
-			<string>string.name.project_path.dired</string>
+			<string>string.name.project_path.kate_documents</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -75,7 +75,7 @@
 			<key>name</key>
 			<string>File/Dir Symbols</string>
 			<key>scope</key>
-			<string>punctuation.definition.directory.symbol.dired, punctuation.definition.file.symbol.dired, dired.item.parent_dir</string>
+			<string>punctuation.definition.directory.symbol.kate_documents, punctuation.definition.file.symbol.kate_documents, kate_documents.item.parent_dir</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -87,7 +87,7 @@
 			<key>name</key>
 			<string>Dir Slash</string>
 			<key>scope</key>
-			<string>punctuation.definition.directory.slash.dired</string>
+			<string>punctuation.definition.directory.slash.kate_documents</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -99,7 +99,7 @@
 			<key>name</key>
 			<string>File Extension</string>
 			<key>scope</key>
-			<string>string.name.file.extension.dired</string>
+			<string>string.name.file.extension.kate_documents</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -111,7 +111,7 @@
 			<key>name</key>
 			<string>Dir Name</string>
 			<key>scope</key>
-			<string>string.name.directory.dired, string.name.project.dired</string>
+			<string>string.name.directory.kate_documents, string.name.project.kate_documents</string>
 			<key>settings</key>
 			<dict>
 				<key>fontStyle</key>
@@ -123,7 +123,7 @@
 			<key>name</key>
 			<string>Header</string>
 			<key>scope</key>
-			<string>header.dired</string>
+			<string>header.kate_documents</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -135,7 +135,7 @@
 			<key>name</key>
 			<string>Header punctuations</string>
 			<key>scope</key>
-			<string>header.dired punctuation.definition.separator.dired</string>
+			<string>header.kate_documents punctuation.definition.separator.kate_documents</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -159,7 +159,7 @@
 			<key>name</key>
 			<string>Marked</string>
 			<key>scope</key>
-			<string>dired.marked</string>
+			<string>kate_documents.marked</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -174,7 +174,7 @@
 			<key>name</key>
 			<string>Help: Table Name</string>
 			<key>scope</key>
-			<string>dired.help.header</string>
+			<string>kate_documents.help.header</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -188,7 +188,7 @@
 			<key>name</key>
 			<string>Help: Table Header</string>
 			<key>scope</key>
-			<string>dired.table.th</string>
+			<string>kate_documents.table.th</string>
 			<key>settings</key>
 			<dict>
 				<key>background</key>
@@ -200,7 +200,7 @@
 			<key>name</key>
 			<string>Help: Table Header > Title</string>
 			<key>scope</key>
-			<string>dired.table.th title</string>
+			<string>kate_documents.table.th title</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -212,7 +212,7 @@
 			<key>name</key>
 			<string>Help: Table Header</string>
 			<key>scope</key>
-			<string>dired.table.tr</string>
+			<string>kate_documents.table.tr</string>
 			<key>settings</key>
 			<dict>
 				<key>background</key>
@@ -224,7 +224,7 @@
 			<key>name</key>
 			<string>Help: Table punctuations</string>
 			<key>scope</key>
-			<string>dired.table.punctuations</string>
+			<string>kate_documents.table.punctuations</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -238,7 +238,7 @@
 			<key>name</key>
 			<string>Help: Shortcut</string>
 			<key>scope</key>
-			<string>dired.table.tr command_shortcut</string>
+			<string>kate_documents.table.tr command_shortcut</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -252,7 +252,7 @@
 			<key>name</key>
 			<string>Help: Command Description</string>
 			<key>scope</key>
-			<string>dired.table.tr command_desc</string>
+			<string>kate_documents.table.tr command_desc</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -265,7 +265,7 @@
 			<key>name</key>
 			<string>Error</string>
 			<key>scope</key>
-			<string>string.error.dired</string>
+			<string>string.error.kate_documents</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
@@ -277,7 +277,7 @@
 			<key>name</key>
 			<string>VCS Modified</string>
 			<key>scope</key>
-			<string>item.modified.dired</string>
+			<string>item.modified.kate_documents</string>
 			<key>settings</key>
 			<dict>
 				<key>background</key>
@@ -291,7 +291,7 @@
 			<key>name</key>
 			<string>VCS Untracked</string>
 			<key>scope</key>
-			<string>item.untracked.dired</string>
+			<string>item.untracked.kate_documents</string>
 			<key>settings</key>
 			<dict>
 				<key>background</key>
@@ -305,7 +305,7 @@
 			<key>name</key>
 			<string>VCS Colorblind</string>
 			<key>scope</key>
-			<string>item.colorblind.dired</string>
+			<string>item.colorblind.kate_documents</string>
 			<key>settings</key>
 			<dict>
 				<key>background</key>

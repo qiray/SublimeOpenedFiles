@@ -117,8 +117,8 @@ def show(window, path, view_id=None, ignore_existing=False, single_pane=False, g
         prev_focus = window.active_view()
         # simulate 'toggle sidebar':
         if prev_focus and 'kate_documents' in prev_focus.scope_name(0):
-            window.run_command('close_file')
-            return
+            # window.run_command('close_file')
+            return prev_focus #don't close the view - we can use it again
 
     if not path.endswith(os.sep):
         path += os.sep
