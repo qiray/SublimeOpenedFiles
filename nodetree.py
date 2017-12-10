@@ -12,10 +12,11 @@ separator = '  '
 
 class Node:
 
-    def __init__(self, id, children, status):
+    def __init__(self, id, children, status, view_id=None):
         self.id = id
         self.children = children
         self.status = status
+        self.view_id = view_id
 
     def add_child(self, child):
         if not child in self.children:
@@ -46,9 +47,14 @@ class Tree:
         self.parents = {}
         self.actions_map = ActionsMap()
 
-    def add_filename(self, filename):
+    def add_filename(self, filename, view_id, is_file):
         arr = filename.split(os.sep)
         length = len(arr)
+        if not is_file:
+            newname = '{} (id = {})'.format(filename, view_id)
+            self.nodes[newname] = Node(newname, {}, 'file', view_id)
+            self.parents[newname] = True
+            return
         if not arr[0] in self.parents:
             self.parents[arr[0]] = True
         for i in range(1, length + 1):
@@ -60,9 +66,9 @@ class Tree:
                 else:
                     self.nodes[name] = Node(name, {child : True}, 'fold')
             else:
-                self.nodes[name] = Node(name, {}, 'file')
+                self.nodes[name] = Node(name, {}, 'file', view_id)
 
-    def __str__(self): #TODO: draw filetree via this method - not current get_path function
+    def __str__(self):
         result = ''
         self.actions_map.clear()
         printed_parents = sorted(self.parents) #dict here becomes list!
@@ -91,7 +97,7 @@ class ActionsMap:
         self.count = 0
 
     def add_action(self, node):
-        self.map[self.count] = {'action' : node.status, 'id' : node.id}
+        self.map[self.count] = {'action' : node.status, 'id' : node.id, 'view_id' : node.view_id}
         self.count += 1
 
     def get_action(self, number):
