@@ -11,8 +11,9 @@ separator = '  '
 
 class Node(object):
 
-    def __init__(self, node_id, children, status, view_id=None):
+    def __init__(self, node_id, children, status, parent=None, view_id=None):
         self.node_id = node_id
+        self.parent = parent
         self.children = children
         self.status = status
         self.view_id = view_id
@@ -53,7 +54,7 @@ class Tree(object):
         length = len(arr)
         if not is_file:
             newname = '{} (id = {})'.format(filename, view_id)
-            self.nodes[newname] = Node(newname, {}, 'file', view_id)
+            self.nodes[newname] = Node(newname, {}, 'file', None, view_id)
             self.parents[newname] = True
             return
         if arr[0] == '':
@@ -67,9 +68,9 @@ class Tree(object):
                 if name in self.nodes:
                     self.nodes[name].add_child(child)
                 else:
-                    self.nodes[name] = Node(name, {child : True}, 'fold')
+                    self.nodes[name] = Node(name, {child : True}, 'fold', os.sep.join(arr[:i - 1]))
             else:
-                self.nodes[name] = Node(name, {}, 'file', view_id)
+                self.nodes[name] = Node(name, {}, 'file', os.sep.join(arr[:i - 1]), view_id)
 
     def __str__(self):
         result = ''
