@@ -1,48 +1,4 @@
 {
-  // If you don't like `..` symbol on the top of each view that moves you to
-  // the parent directory and want to hide it you can set this to false
-  "dired_show_parent": true,
-
-  // If you want to see header (underlined full path) on top of file list
-  "dired_header": false,
-
-  // If you want to see full path in tab title and thus in window title
-  // if tab is focused
-  "dired_show_full_path": false,
-
-  // If true 'Send to Trash' command will confirm the action with a dialog box
-  "dired_confirm_send2trash": true,
-
-  // Showing hidden files by default
-  "dired_show_hidden_files": true,
-
-  // Customize the patterns used to determine if a file should be hidden
-  // e.g. [".*", "__pycache__", "*.pyc"]
-  "dired_hidden_files_patterns": [".*"],
-
-  // (ST3 Only) shows a FileBrowser or a jump list view in new window by default
-  // false: hijacking is disabled
-  // "jump_list": shows the project jump list
-  // "dired"    : shows a normal FileBrower view defaults to user directory
-  "dired_hijack_new_window": false,
-
-  // Path to git executable.
-  // Wildcards are supported, e.g. if you use GitHub for Windows it would be:
-  //     "git_path": "~/Appdata/Local/GitHub/PortableGit_*/cmd/git.exe"
-  // To disable git integration set to empty string:
-  //     "git_path": ""
-  "git_path": "git",
-
-  // Path to hg executable.
-  // Wildcards are supported, e.g. if you use TortoiseHg it would be:
-  //     "hg_path": "%ProgramFiles%/TortoiseHg/hg.exe"
-  // To disable hg integration set to empty string:
-  //     "hg_path": ""
-  "hg_path": "hg",
-
-  // true: the default, pressing Enter on a directory uses the current view.
-  // false: a new view is created.
-  "dired_reuse_view": true,
 
   // How should be positioned the Browse Mode view opened when jumping
   // "left": the default, open the view on the left
@@ -63,12 +19,6 @@
 
   // Automatically refresh view(s) in case of any changes in open directories
   "dired_autorefresh": true,
-
-  // String to place between file name and generic number in case of conflicting
-  // filenames (i.e. duplicate, copy, move), e.g.
-  //   file.ext → file — 2.ext
-  // Only for OSX and Linux.
-  "dired_dup_separator": " — ",
 
   // Automatically disable Vintageous to avoid keybindings incompatibilities;
   // note it is Vintageous setting, if it does not work you should report into
@@ -91,7 +41,7 @@
   "margin": 0,
   "tab_size": 3,
   "rulers": [],
-  "caret_extra_width": 0 // extra caret width causes partially hidden chars
-  // "font_face": "comic sans",
-  // "font_size": 13,
+  "caret_extra_width": 0, // extra caret width causes partially hidden chars
+  // "font_face": "sans-serif",
+  // "font_size": 9,
 }

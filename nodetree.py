@@ -4,16 +4,15 @@
 
 import os
 import sublime
-from os.path import basename
 
 ST3 = int(sublime.version()) >= 3000
 
 separator = '  '
 
-class Node:
+class Node(object):
 
-    def __init__(self, id, children, status, view_id=None):
-        self.id = id
+    def __init__(self, node_id, children, status, view_id=None):
+        self.node_id = node_id
         self.children = children
         self.status = status
         self.view_id = view_id
@@ -23,7 +22,9 @@ class Node:
             self.children[child] = True
 
     def get_name(self):
-        arr = self.id.split(os.sep)
+        arr = self.node_id.split(os.sep)
+        if arr[-1] == '':
+            arr[-1] = os.sep
         if self.status == 'unfold':
             return '▸ ' + arr[-1]
         elif self.status == 'fold':
@@ -40,7 +41,7 @@ class Node:
             result += array[child].print_children(array, actions_map, length + 1)
         return result
 
-class Tree:
+class Tree(object):
 
     def __init__(self):
         self.nodes = {}
@@ -55,6 +56,8 @@ class Tree:
             self.nodes[newname] = Node(newname, {}, 'file', view_id)
             self.parents[newname] = True
             return
+        if arr[0] == '':
+            arr[0] = os.sep
         if not arr[0] in self.parents:
             self.parents[arr[0]] = True
         for i in range(1, length + 1):
@@ -76,8 +79,8 @@ class Tree:
             key = printed_parents[0]
             templist = sorted(self.nodes[key].children)
             flag = False
-            for file in templist:
-                if self.nodes[file].status == 'file':
+            for filename in templist:
+                if self.nodes[filename].status == 'file':
                     flag = True
                     break
             if flag:
@@ -90,14 +93,14 @@ class Tree:
     def get_action(self, number):
         return self.actions_map.get_action(number)
 
-class ActionsMap:
+class ActionsMap(object):
 
     def __init__(self):
         self.map = {}
         self.count = 0
 
     def add_action(self, node):
-        self.map[self.count] = {'action' : node.status, 'id' : node.id, 'view_id' : node.view_id}
+        self.map[self.count] = {'action' : node.status, 'id' : node.node_id, 'view_id' : node.view_id}
         self.count += 1
 
     def get_action(self, number):

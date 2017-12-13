@@ -7,18 +7,17 @@ file_extensions:
 scope: text.kate_documents
 contexts:
   main:
-    - match: '^(\s*)([▸▾] )([^\\/]*)(\\|/)?(.*)?$'
+    - match: '^(\s*)([▸▾] )(.*)?$'
       scope: kate_documents.item.directory
       captures:
         1: indent
         2: punctuation.definition.directory.symbol.kate_documents
         3: string.name.directory.kate_documents
-        4: punctuation.definition.directory.slash.kate_documents
-        5: string.error.kate_documents
-    - match: '^(\s*)(≡ )(\S.*?(\.[^\.\n]+)?)$'
+    - match: '^(\s*)(≡ )(\S.*?(\.[^\.\n]+)?)( \(.*\))?$'
       scope: kate_documents.item.file
       captures:
         1: indent
         2: punctuation.definition.file.symbol.kate_documents
         3: string.name.file.kate_documents
         4: string.name.file.extension.kate_documents
+        5: string.name.file.view_id.kate_documents

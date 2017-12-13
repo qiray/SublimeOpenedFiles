@@ -38,60 +38,15 @@
 
 		<dict>
 			<key>name</key>
-			<string>Project Symbols > Star</string>
-			<key>scope</key>
-			<string>punctuation.definition.projects.star.symbol.kate_documents</string>
-			<key>settings</key>
-			<dict>
-				<key>foreground</key>
-				<string>#7c8692</string>
-			</dict>
-		</dict>
-		<dict>
-			<key>name</key>
-			<string>Project Symbols > Chevron</string>
-			<key>scope</key>
-			<string>punctuation.definition.projects.chevron.symbol.kate_documents</string>
-			<key>settings</key>
-			<dict>
-				<key>foreground</key>
-				<string>#7c869266</string>
-			</dict>
-		</dict>
-
-		<dict>
-			<key>name</key>
-			<string>Project Path</string>
-			<key>scope</key>
-			<string>string.name.project_path.kate_documents</string>
-			<key>settings</key>
-			<dict>
-				<key>foreground</key>
-				<string>#707e8b</string>
-			</dict>
-		</dict>
-
-		<dict>
-			<key>name</key>
 			<string>File/Dir Symbols</string>
 			<key>scope</key>
 			<string>punctuation.definition.directory.symbol.kate_documents, punctuation.definition.file.symbol.kate_documents, kate_documents.item.parent_dir</string>
 			<key>settings</key>
 			<dict>
+				<key>fontStyle</key>
+				<string>bold</string>
 				<key>foreground</key>
-				<string>#7c8692</string>
-			</dict>
-		</dict>
-
-		<dict>
-			<key>name</key>
-			<string>Dir Slash</string>
-			<key>scope</key>
-			<string>punctuation.definition.directory.slash.kate_documents</string>
-			<key>settings</key>
-			<dict>
-				<key>foreground</key>
-				<string>#919aa388</string>
+				<string>#000000</string>
 			</dict>
 		</dict>
 
@@ -103,7 +58,19 @@
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
-				<string>#919aa3</string>
+				<string>#4888BD</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>File Extension</string>
+			<key>scope</key>
+			<string>string.name.file.view_id.kate_documents</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#7F80C9</string>
 			</dict>
 		</dict>
 
@@ -116,42 +83,8 @@
 			<dict>
 				<key>fontStyle</key>
 				<string>bold</string>
-			</dict>
-		</dict>
-
-		<dict>
-			<key>name</key>
-			<string>Header</string>
-			<key>scope</key>
-			<string>header.kate_documents</string>
-			<key>settings</key>
-			<dict>
 				<key>foreground</key>
-				<string>#707e8b</string>
-			</dict>
-		</dict>
-
-		<dict>
-			<key>name</key>
-			<string>Header punctuations</string>
-			<key>scope</key>
-			<string>header.kate_documents punctuation.definition.separator.kate_documents</string>
-			<key>settings</key>
-			<dict>
-				<key>foreground</key>
-				<string>#6f798733</string>
-			</dict>
-		</dict>
-
-		<dict>
-			<key>name</key>
-			<string>Header Rename Mode Title</string>
-			<key>scope</key>
-			<string>punctuation.definition.rename_mode</string>
-			<key>settings</key>
-			<dict>
-				<key>foreground</key>
-				<string>#E99023</string>
+				<string>#2C2E99</string>
 			</dict>
 		</dict>
 
@@ -169,98 +102,6 @@
 			</dict>
 		</dict>
 
-		<!-- HELP ----------------------------- -->
-		<dict>
-			<key>name</key>
-			<string>Help: Table Name</string>
-			<key>scope</key>
-			<string>kate_documents.help.header</string>
-			<key>settings</key>
-			<dict>
-				<key>foreground</key>
-				<string>#707E8B</string>
-				<key>fontStyle</key>
-				<string>bold</string>
-			</dict>
-		</dict>
-
-		<dict>
-			<key>name</key>
-			<string>Help: Table Header</string>
-			<key>scope</key>
-			<string>kate_documents.table.th</string>
-			<key>settings</key>
-			<dict>
-				<key>background</key>
-				<string>#4B96D6</string>
-			</dict>
-		</dict>
-
-		<dict>
-			<key>name</key>
-			<string>Help: Table Header > Title</string>
-			<key>scope</key>
-			<string>kate_documents.table.th title</string>
-			<key>settings</key>
-			<dict>
-				<key>foreground</key>
-				<string>#FFFFFF</string>
-			</dict>
-		</dict>
-
-		<dict>
-			<key>name</key>
-			<string>Help: Table Header</string>
-			<key>scope</key>
-			<string>kate_documents.table.tr</string>
-			<key>settings</key>
-			<dict>
-				<key>background</key>
-				<string>#FFFFFF</string>
-			</dict>
-		</dict>
-
-		<dict>
-			<key>name</key>
-			<string>Help: Table punctuations</string>
-			<key>scope</key>
-			<string>kate_documents.table.punctuations</string>
-			<key>settings</key>
-			<dict>
-				<key>foreground</key>
-				<string>#d9dee5</string>
-				<key>background</key>
-				<string>#d9dee5</string>
-			</dict>
-		</dict>
-
-		<dict>
-			<key>name</key>
-			<string>Help: Shortcut</string>
-			<key>scope</key>
-			<string>kate_documents.table.tr command_shortcut</string>
-			<key>settings</key>
-			<dict>
-				<key>foreground</key>
-				<string>#D6774B</string>
-				<key>fontStyle</key>
-				<string>bold</string>
-			</dict>
-		</dict>
-
-		<dict>
-			<key>name</key>
-			<string>Help: Command Description</string>
-			<key>scope</key>
-			<string>kate_documents.table.tr command_desc</string>
-			<key>settings</key>
-			<dict>
-				<key>foreground</key>
-				<string>#000000</string>
-			</dict>
-		</dict>
-		<!-- /HELP ---------------------------- -->
-
 		<dict>
 			<key>name</key>
 			<string>Error</string>
@@ -272,47 +113,6 @@
 				<string>#aa0000</string>
 			</dict>
 		</dict>
-
-		<dict>
-			<key>name</key>
-			<string>VCS Modified</string>
-			<key>scope</key>
-			<string>item.modified.kate_documents</string>
-			<key>settings</key>
-			<dict>
-				<key>background</key>
-				<string>#d9dee0</string>
-				<key>foreground</key>
-				<string>#F09609</string>
-			</dict>
-		</dict>
-
-		<dict>
-			<key>name</key>
-			<string>VCS Untracked</string>
-			<key>scope</key>
-			<string>item.untracked.kate_documents</string>
-			<key>settings</key>
-			<dict>
-				<key>background</key>
-				<string>#d9dee0</string>
-				<key>foreground</key>
-				<string>#00c406</string>
-			</dict>
-		</dict>
-
-		<dict>
-			<key>name</key>
-			<string>VCS Colorblind</string>
-			<key>scope</key>
-			<string>item.colorblind.kate_documents</string>
-			<key>settings</key>
-			<dict>
-				<key>background</key>
-				<string>#000000</string>
-			</dict>
-		</dict>
-
 	</array>
 	<key>uuid</key>
 	<string>07379361-ce49-4e6c-a03f-26378a7a2131</string>

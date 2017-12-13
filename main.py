@@ -40,7 +40,7 @@ def generate_tree(view_list):
     localtree = Tree()
     for view in view_list:
         name = view_name(view)
-        localtree.add_filename(name, view.id(), is_file = True if view.file_name() is not None else False)
+        localtree.add_filename(name, view.id(), is_file=False if view.file_name() is None else True)
     return localtree
 
 def draw_tree(window, edit, tree):
@@ -83,7 +83,6 @@ class KateDocumentsCommand(sublime_plugin.TextCommand): #view.run_command('kate_
 
 class KateDocumentsOpenCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        (row, col) = self.view.rowcol(self.view.sel()[0].begin())
         selection = self.view.sel()[0]
         self.open_file(edit, selection)
 
@@ -91,7 +90,6 @@ class KateDocumentsOpenCommand(sublime_plugin.TextCommand):
         global tree
         window = self.view.window()
         (row, col) = self.view.rowcol(selection.begin())
-        filename = self.view.substr(self.view.line(selection))
 
         action = tree.get_action(row)
         if action is None:
@@ -100,12 +98,16 @@ class KateDocumentsOpenCommand(sublime_plugin.TextCommand):
             view = first(window.views(), lambda v: v.id() == action['view_id'])
             window.focus_view(view)
             # window.open_file(action['id'])
-        elif action['action']  == 'fold':
+        elif action['action'] == 'fold':
             tree.nodes[action['id']].status = 'unfold'
             draw_tree(window, edit, tree)
-        elif action['action']  == 'unfold':
+        elif action['action'] == 'unfold':
             tree.nodes[action['id']].status = 'fold'
             draw_tree(window, edit, tree)
+
+class OpenedDocumentsNoopCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        pass
 
 # MOUSE ACTIONS ##############################################
 

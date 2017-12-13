@@ -1,2 +1,59 @@
 // some bindings are in OS-specific files
-[]
+[
+  {
+      "keys": ["backspace"],
+      "command": "kate_documents",
+      "context": [
+        { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
+      ]
+  },
+  {
+      "keys": ["enter"],
+      "command": "kate_documents",
+      "context": [
+        { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
+      ]
+  },
+  {
+      "keys": ["right"],
+      "command": "kate_documents",
+      "context": [
+        { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
+      ]
+  },
+  {
+      "keys": ["left"],
+      "command": "kate_documents",
+      "context": [
+        { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
+      ]
+  },
+  {
+    "keys": ["\\"],
+    "command": "kate_documents",
+    "context": [
+        { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
+    ]
+  },
+  {
+    "keys": ["?"],
+    "command": "kate_documents",
+    "context": [
+        { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
+    ]
+  },
+  {
+      "keys": ["r"],
+      "command": "kate_documents",
+      "context": [
+		{ "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
+      ]
+  },
+  {
+      "keys": ["delete"],
+      "command": "opened_documents_noop",
+      "context": [
+        { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
+      ]
+  }
+]
