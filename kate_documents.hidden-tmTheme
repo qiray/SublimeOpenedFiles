@@ -52,6 +52,18 @@
 
 		<dict>
 			<key>name</key>
+			<string>File name</string>
+			<key>scope</key>
+			<string>string.name.file.kate_documents</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#2C2E99</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
 			<string>File Extension</string>
 			<key>scope</key>
 			<string>string.name.file.extension.kate_documents</string>
@@ -64,7 +76,7 @@
 
 		<dict>
 			<key>name</key>
-			<string>File Extension</string>
+			<string>File View ID</string>
 			<key>scope</key>
 			<string>string.name.file.view_id.kate_documents</string>
 			<key>settings</key>
@@ -83,8 +95,6 @@
 			<dict>
 				<key>fontStyle</key>
 				<string>bold</string>
-				<key>foreground</key>
-				<string>#2C2E99</string>
 			</dict>
 		</dict>
 
