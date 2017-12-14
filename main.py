@@ -81,16 +81,12 @@ class KateDocumentsCommand(sublime_plugin.TextCommand): #view.run_command('kate_
         tree = generate_tree(view_list)
         draw_tree(window, edit, tree)
 
-#TODO: make 1 class/command for all actions - fold/unfold and open
-#TODO: make correct cursor moving
-#TODO: open file browser or any default app on "/" pressed
-
 class KateDocumentsActCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
+    def run(self, edit, act = 'default'):
         selection = self.view.sel()[0]
-        self.open_file(edit, selection)
+        self.open_file(edit, selection, act)
 
-    def open_file(self, edit, selection):
+    def open_file(self, edit, selection, act):
         global tree
         window = self.view.window()
         (row, col) = self.view.rowcol(selection.begin())
@@ -98,59 +94,35 @@ class KateDocumentsActCommand(sublime_plugin.TextCommand):
         action = tree.get_action(row)
         if action is None:
             return
-        if action['action'] == 'file':
-            view = first(window.views(), lambda v: v.id() == action['view_id'])
-            window.focus_view(view)
-        elif action['action'] == 'fold':
+        node = tree.nodes[action['id']]
+        goto_linenumber = row + 1
+        if action['action'] == 'file' and act == 'default':
+                view = first(window.views(), lambda v: v.id() == action['view_id'])
+                window.focus_view(view)               
+        elif action['action'] == 'fold' and act != 'unfold':
             tree.nodes[action['id']].status = 'unfold'
             draw_tree(window, edit, tree)
-        elif action['action'] == 'unfold':
+        elif action['action'] == 'unfold' and act != 'fold':
             tree.nodes[action['id']].status = 'fold'
             draw_tree(window, edit, tree)
-        self.view.run_command("goto_line", {"line": row + 1})
+        elif act == 'fold' and node.parent is not None and node.parent != '':
+            goto_linenumber = tree.nodes[node.parent].stringnum
+            tree.nodes[node.parent].status = 'unfold'
+            draw_tree(window, edit, tree)
+        elif act == 'unfold' and len(node.children) > 0:
+            goto_linenumber = tree.nodes[sorted(node.children)[0]].stringnum
+            print(len(node.children))
+        self.view.run_command("goto_line", {"line": goto_linenumber})
 
-class KateDocumentsFoldCommand(sublime_plugin.TextCommand):
+class KateDocumentsOpenExternalCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        global tree
         selection = self.view.sel()[0]
-        window = self.view.window()
         (row, col) = self.view.rowcol(selection.begin())
         action = tree.get_action(row)
         if action is None:
             return
-        if action['action'] == 'file':
-            node = tree.nodes[action['id']]
-            if node.parent is not None:
-                tree.nodes[node.parent].status = 'unfold'
-                draw_tree(window, edit, tree)
-        elif action['action'] == 'fold':
-            tree.nodes[action['id']].status = 'unfold'
-            draw_tree(window, edit, tree)
-        if row != 0:
-            self.view.run_command("goto_line", {"line": row})
-
-class KateDocumentsUnfoldCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        global tree
-        selection = self.view.sel()[0]
-        window = self.view.window()
-        (row, col) = self.view.rowcol(selection.begin())
-        action = tree.get_action(row)
-        if action is None:
-            return
-        if action['action'] == 'file':
-            node = tree.nodes[action['id']]
-            if node.parent is not None:
-                tree.nodes[node.parent].status = 'fold'
-                draw_tree(window, edit, tree)
-        elif action['action'] == 'unfold':
-            tree.nodes[action['id']].status = 'fold'
-            draw_tree(window, edit, tree)
-        self.view.run_command("goto_line", {"line": row + 2})
-
-class OpenedDocumentsNoopCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        pass
+        node = tree.nodes[action['id']]
+        self.view.window().run_command("open_dir", {"dir": node.node_id})        
 
 # MOUSE ACTIONS ##############################################
 

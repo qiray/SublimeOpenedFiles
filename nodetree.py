@@ -32,15 +32,18 @@ class Node(object):
             return '▾ ' + arr[-1]
         return '≡ '+ arr[-1]
 
-    def print_children(self, array, actions_map, length):
+    def print_children(self, array, actions_map, length, stringnum):
         result = separator*length + self.get_name() + '\n'
+        self.stringnum = stringnum
+        stringnum += 1
         actions_map.add_action(self)
         if self.status == 'unfold':
-            return result
+            return result, stringnum
         children = sorted(self.children)
         for child in children:
-            result += array[child].print_children(array, actions_map, length + 1)
-        return result
+            temp, stringnum = array[child].print_children(array, actions_map, length + 1, stringnum)
+            result += temp
+        return result, stringnum
 
 class Tree(object):
 
@@ -87,8 +90,10 @@ class Tree(object):
             if flag:
                 break
             printed_parents = templist
+        stringnum = 1
         for name in printed_parents:
-            result += self.nodes[name].print_children(self.nodes, self.actions_map, 0)
+            temp, stringnum = self.nodes[name].print_children(self.nodes, self.actions_map, 0, stringnum)
+            result += temp
         return result
 
     def get_action(self, number):

@@ -17,29 +17,28 @@
 
   {
       "keys": ["right"],
-      "command": "kate_documents_unfold",
+      "command": "kate_documents_act", "args": {"act": "unfold"},
       "context": [
         { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
       ]
   },
   {
       "keys": ["left"],
-      "command": "kate_documents_fold",
+      "command": "kate_documents_act", "args": {"act": "fold"},
       "context": [
         { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
       ]
   },
-  
   {
       "keys": ["backspace"],
-      "command": "kate_documents_fold",
+      "command": "kate_documents_act", "args": {"act": "fold"},
       "context": [
         { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
       ]
   },
   {
-    "keys": ["\\"],
-    "command": "kate_documents",
+    "keys": ["o"],
+    "command": "kate_documents_open_external",
     "context": [
         { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
     ]
