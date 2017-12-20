@@ -52,6 +52,9 @@ class Tree(object):
         self.parents = {}
         self.actions_map = ActionsMap()
 
+    def get_nodes(self):
+        return self.nodes
+
     def get_node(self, node_id):
         if node_id in self.nodes:
             return self.nodes[node_id]

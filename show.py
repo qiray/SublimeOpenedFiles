@@ -41,7 +41,7 @@ def get_group(groups, nag):
         group = nag - 1
     return group
 
-def set_active_group(window, view, other_group):
+def set_active_group(window, view, other_group, view_exist):
     nag = window.active_group()
     if other_group:
         group = 0 if other_group == 'left' else 1
@@ -52,7 +52,8 @@ def set_active_group(window, view, other_group):
             window.set_layout({"cols": cols, "rows": [0.0, 1.0], "cells": [[0, 0, 1, 1], [1, 0, 2, 1]]})
         elif view:
             group = get_group(groups, nag)
-        window.set_view_index(view, group, 0)
+        if not view_exist:
+            window.set_view_index(view, group, 0)
     else:
         group = nag
 
@@ -64,49 +65,38 @@ def set_active_group(window, view, other_group):
     return (nag, group)
 
 
-def set_view(view_id, window, ignore_existing, path, single_pane):
+def set_view(view_id, window):
     view = None
     if view_id:
-        # The Goto command was used so the view is already known and its contents should be
-        # replaced with the new path.
         view = first(window.views(), lambda v: v.id() == view_id)
-
-    if not view and not ignore_existing:
-        # See if a view for this path already exists.
-        same_path = lambda v: v.settings().get('dired_path') == path
-        # See if any reusable view exists in case of single_pane argument
-        any_path = lambda v: v.score_selector(0, "text.opened_files") > 0
-        view = first(window.views(), any_path if single_pane else same_path)
 
     if not view:
         view = window.new_file()
         view.settings().add_on_change('color_scheme', lambda: set_proper_scheme(view))
         view.set_syntax_file('Packages/OpenedFiles/opened_files' + SYNTAX_EXTENSION)
         view.set_scratch(True)
-        reset_sels = True
-    else:
-        reset_sels = path != view.settings().get('dired_path', '')
 
-    return (view, reset_sels)
+    return view
 
 
-def show(window, path, view_id=None, ignore_existing=False, single_pane=False, goto='', other_group=False):
+def show(window, path, view_id=None, ignore_existing=False, single_pane=False, other_group=False):
     """
     Determines the correct view to use, creating one if necessary, and prepares it.
     """
+    view_exist = first(window.views(), lambda v: v.settings().get("opened_files_type"))
+
     if other_group:
         prev_focus = window.active_view()
         # simulate 'toggle sidebar':
         if prev_focus and 'opened_files' in prev_focus.scope_name(0):
-            # window.run_command('close_file')
             return prev_focus #don't close the view - we can use it again
 
     if not path.endswith(os.sep):
         path += os.sep
 
-    view, reset_sels = set_view(view_id, window, ignore_existing, path, single_pane)
+    view = set_view(view_id, window)
 
-    nag, group = set_active_group(window, view, other_group)
+    nag, group = set_active_group(window, view, other_group, view_exist)
 
     if other_group and prev_focus:
         window.focus_view(prev_focus)
@@ -126,7 +116,6 @@ def show(window, path, view_id=None, ignore_existing=False, single_pane=False, g
 
     # forcibly shoot on_activated, because when view was created it didnot have any settings
     window.show_quick_panel(['a', 'b'], None)
-    # view.run_command('dired_refresh', {'goto': goto, 'reset_sels': reset_sels})
     window.run_command('hide_overlay')
     if view_id is None:
         window.focus_view(view)

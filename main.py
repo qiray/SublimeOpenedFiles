@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os
-
 import sublime
 import sublime_plugin
 
@@ -12,6 +10,12 @@ VERSION_REVISION = 3
 
 ST3 = int(sublime.version()) >= 3000
 OPENED_FILES_VIEW = None
+
+#TODO: open/reopen files in other tab
+#TODO: prevent from showing filebrowser view when open/reopen
+#TODO: show files after all filetrees
+#TODO: add listview along with treeview (like in Atom editor)
+#TODO: add max depth (like in Kate editor)
 
 if ST3:
     from .show import show, first
@@ -40,13 +44,14 @@ def generate_tree(view_list, localtree):
     result = Tree()
     for view in view_list:
         name = view_name(view)
-        node = localtree.get_node(name)
-        if node:
-            #TODO: solve this and check focus for new file/reopen etc
-            # result.set_node(name, node)
-            result.add_filename(name, view.id(), is_file=False if view.file_name() is None else True)
-        else:
-            result.add_filename(name, view.id(), is_file=False if view.file_name() is None else True)
+        result.add_filename(name, view.id(), is_file=False if view.file_name() is None else True)
+    nodes = result.get_nodes()
+    for n in nodes:
+        old_node = localtree.get_node(n)
+        new_node = result.get_node(n)
+        if old_node:
+            new_node.status = old_node.status
+            result.set_node(n, new_node)
     return result
 
 def draw_tree(window, edit, tree):
@@ -63,7 +68,7 @@ def draw_tree(window, edit, tree):
     view.set_read_only(True) #Disable edit
 
 class OpenedFilesCommand(sublime_plugin.TextCommand): #view.run_command('opened_files')
-
+    
     untitled_name = 'untitled' #const
     debug_level = 1
 
@@ -169,13 +174,13 @@ def get_opened_files_view():
             view = first(views, lambda v: v.id() == OPENED_FILES_VIEW)
         else:
             view = first(views, lambda v: v.settings().get("opened_files_type"))
-        if view is not None:
+        if view:
             return view
     return None
 
-def update_opened_files_view(): #TODO: save fold/unfold status
+def update_opened_files_view():
     view = get_opened_files_view()
-    if view is not None:
+    if view:
         view.run_command('opened_files')
 
 class SampleListener(sublime_plugin.EventListener):
