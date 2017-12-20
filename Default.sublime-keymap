@@ -2,45 +2,45 @@
 [
   {
       "keys": ["r"],
-      "command": "kate_documents",
+      "command": "opened_files",
       "context": [
-        { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
+        { "key": "selector", "operator": "equal", "operand": "text.opened_files" },
       ]
   },
   {
       "keys": ["enter"],
-      "command": "kate_documents_act",
+      "command": "opened_files_act",
       "context": [
-        { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
+        { "key": "selector", "operator": "equal", "operand": "text.opened_files" },
       ]
   },
 
   {
       "keys": ["right"],
-      "command": "kate_documents_act", "args": {"act": "unfold"},
+      "command": "opened_files_act", "args": {"act": "unfold"},
       "context": [
-        { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
+        { "key": "selector", "operator": "equal", "operand": "text.opened_files" },
       ]
   },
   {
       "keys": ["left"],
-      "command": "kate_documents_act", "args": {"act": "fold"},
+      "command": "opened_files_act", "args": {"act": "fold"},
       "context": [
-        { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
+        { "key": "selector", "operator": "equal", "operand": "text.opened_files" },
       ]
   },
   {
       "keys": ["backspace"],
-      "command": "kate_documents_act", "args": {"act": "fold"},
+      "command": "opened_files_act", "args": {"act": "fold"},
       "context": [
-        { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
+        { "key": "selector", "operator": "equal", "operand": "text.opened_files" },
       ]
   },
   {
     "keys": ["o"],
-    "command": "kate_documents_open_external",
+    "command": "opened_files_open_external",
     "context": [
-        { "key": "selector", "operator": "equal", "operand": "text.kate_documents" },
+        { "key": "selector", "operator": "equal", "operand": "text.opened_files" },
     ]
   },
 ]

@@ -1,3 +1,3 @@
-# Kate Documents
+# Sublime Opened Files
 
-Plugin for Sublime Text to show opened files as a treeview like Kate editor
+Plugin for Sublime Text to show opened files as a treeview and a listview.

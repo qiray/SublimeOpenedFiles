@@ -1,0 +1,23 @@
+%YAML 1.2
+---
+name: opened_files
+hidden: true
+file_extensions:
+  - opened_files
+scope: text.opened_files
+contexts:
+  main:
+    - match: '^(\s*)([▸▾] )(.*)?$'
+      scope: opened_files.item.directory
+      captures:
+        1: indent
+        2: punctuation.definition.directory.symbol.opened_files
+        3: string.name.directory.opened_files
+    - match: '^(\s*)(≡ )(\S.*?(\.[^\.\n]+)?)( \(.*\))?$'
+      scope: opened_files.item.file
+      captures:
+        1: indent
+        2: punctuation.definition.file.symbol.opened_files
+        3: string.name.file.opened_files
+        4: string.name.file.extension.opened_files
+        5: string.name.file.view_id.opened_files

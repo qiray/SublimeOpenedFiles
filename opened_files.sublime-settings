@@ -29,7 +29,7 @@
   // make FileBrowser views look more like a file browser than an editor
   // This plugin does not change font and font size, but it's
   // highly recommended to customize them in your user files.
-  "color_scheme": "Packages/KateDocuments/kate_documents.hidden-tmTheme",
+  "color_scheme": "Packages/OpenedFiles/opened_files.hidden-tmTheme",
   "line_numbers": false,
   "word_wrap": false,
   "spell_check": false,

@@ -11,7 +11,7 @@ VERSION_MINOR = 0
 VERSION_REVISION = 3
 
 ST3 = int(sublime.version()) >= 3000
-KATE_DOCUMENTS_VIEW = None
+OPENED_FILES_VIEW = None
 
 if ST3:
     from .show import show, first
@@ -23,11 +23,11 @@ else:  # ST2 imports
 tree = Tree()
 
 def debug(level, *args):
-    if level <= KateDocumentsCommand.debug_level:
+    if level <= OpenedFilesCommand.debug_level:
         print('[DEBUG]', level, args)
 
 def view_name(view):
-    result = KateDocumentsCommand.untitled_name
+    result = OpenedFilesCommand.untitled_name
     filename = view.file_name()
     name = view.name()
     if filename is not None and filename != '':
@@ -44,25 +44,25 @@ def generate_tree(view_list):
     return localtree
 
 def draw_tree(window, edit, tree):
-    global KATE_DOCUMENTS_VIEW
+    global OPENED_FILES_VIEW
 
-    view = show(window, 'Documents', view_id=KATE_DOCUMENTS_VIEW, other_group=True)
+    view = show(window, 'Documents', view_id=OPENED_FILES_VIEW, other_group=True)
     if not view:
-        KATE_DOCUMENTS_VIEW = None
+        OPENED_FILES_VIEW = None
         return
-    KATE_DOCUMENTS_VIEW = view.id()
+    OPENED_FILES_VIEW = view.id()
     view.set_read_only(False) #Enable edit for pasting result
     view.erase(edit, sublime.Region(0, view.size())) #clear view content
     view.insert(edit, 0, str(tree)) #paste result tree
     view.set_read_only(True) #Disable edit
 
-class KateDocumentsCommand(sublime_plugin.TextCommand): #view.run_command('kate_documents')
+class OpenedFilesCommand(sublime_plugin.TextCommand): #view.run_command('opened_files')
 
     untitled_name = 'untitled' #const
     debug_level = 1
 
     def run(self, edit):
-        global KATE_DOCUMENTS_VIEW
+        global OPENED_FILES_VIEW
         global tree
         window = self.view.window()
         view_list = window.views()
@@ -70,8 +70,8 @@ class KateDocumentsCommand(sublime_plugin.TextCommand): #view.run_command('kate_
         temp = []
         for view in view_list:
             s = view.settings()
-            if s.get("kate_documents_type"):
-                KATE_DOCUMENTS_VIEW = view.id()
+            if s.get("opened_files_type"):
+                OPENED_FILES_VIEW = view.id()
             elif s.get('dired_path'):
                 pass
             else:
@@ -81,7 +81,7 @@ class KateDocumentsCommand(sublime_plugin.TextCommand): #view.run_command('kate_
         tree = generate_tree(view_list)
         draw_tree(window, edit, tree)
 
-class KateDocumentsActCommand(sublime_plugin.TextCommand):
+class OpenedFilesActCommand(sublime_plugin.TextCommand):
     def run(self, edit, act = 'default'):
         selection = self.view.sel()[0]
         self.open_file(edit, selection, act)
@@ -97,8 +97,8 @@ class KateDocumentsActCommand(sublime_plugin.TextCommand):
         node = tree.nodes[action['id']]
         goto_linenumber = row + 1
         if action['action'] == 'file' and act == 'default':
-                view = first(window.views(), lambda v: v.id() == action['view_id'])
-                window.focus_view(view)               
+            view = first(window.views(), lambda v: v.id() == action['view_id'])
+            window.focus_view(view)   
         elif action['action'] == 'fold' and act != 'unfold':
             tree.nodes[action['id']].status = 'unfold'
             draw_tree(window, edit, tree)
@@ -111,10 +111,9 @@ class KateDocumentsActCommand(sublime_plugin.TextCommand):
             draw_tree(window, edit, tree)
         elif act == 'unfold' and len(node.children) > 0:
             goto_linenumber = tree.nodes[sorted(node.children)[0]].stringnum
-            print(len(node.children))
         self.view.run_command("goto_line", {"line": goto_linenumber})
 
-class KateDocumentsOpenExternalCommand(sublime_plugin.TextCommand):
+class OpenedFilesOpenExternalCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         selection = self.view.sel()[0]
         (row, col) = self.view.rowcol(selection.begin())
@@ -128,8 +127,8 @@ class KateDocumentsOpenExternalCommand(sublime_plugin.TextCommand):
 
 def mouse_click_actions(view, args):
     s = view.settings()
-    if s.get("kate_documents_type"):
-        view.run_command('kate_documents_act') #call user defined command
+    if s.get("opened_files_type"):
+        view.run_command('opened_files_act') #call user defined command
     elif s.get("dired_path") and not s.get("dired_rename_mode"): #for FileBrowser plugin
         if 'directory' in view.scope_name(view.sel()[0].a):
             command = ("dired_expand", {"toggle": True})
@@ -155,10 +154,10 @@ else:
 #TODO: add event listener for open/close/new tabs
 # class SampleListener(sublime_plugin.EventListener):
 #     def on_load(self, view):
-#         view.run_command('kate_documents')
+#         view.run_command('opened_files')
 
 #     def on_pre_close(self, view):
 #         print('Closing!' + view.name())
 #         s = view.settings()`
-#         if not s.get("kate_documents_type"):
-#             view.run_command('kate_documents')
+#         if not s.get("opened_files_type"):
+#             view.run_command('opened_files')

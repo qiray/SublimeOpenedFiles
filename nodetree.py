@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-
 import os
 import sublime
 
@@ -17,6 +16,7 @@ class Node(object):
         self.children = children
         self.status = status
         self.view_id = view_id
+        self.stringnum = ''
 
     def add_child(self, child):
         if not child in self.children:

@@ -3,14 +3,14 @@
 <plist version="1.0">
 <dict>
     <key>name</key>
-    <string>kate_documents</string>
+    <string>opened_files</string>
     <key>scopeName</key>
-    <string>text.kate_documents</string>
+    <string>text.opened_files</string>
     <key>uuid</key>
     <string>638375b8-3509-4d37-a8d8-afad7a95b428</string>
     <key>fileTypes</key>
     <array>
-        <string>kate_documents</string>
+        <string>opened_files</string>
     </array>
     <key>patterns</key>
     <array>
@@ -19,7 +19,7 @@
           <key>match</key>
           <string>^(\s*)([▸▾] )([^\\/]*)(\\|/)?(.*)?$</string>
           <key>name</key>
-          <string>kate_documents.item.directory</string>
+          <string>opened_files.item.directory</string>
           <key>captures</key>
           <dict>
               <key>1</key>
@@ -30,22 +30,22 @@
               <key>2</key>
               <dict>
                   <key>name</key>
-                  <string>punctuation.definition.directory.symbol.kate_documents</string>
+                  <string>punctuation.definition.directory.symbol.opened_files</string>
               </dict>
               <key>3</key>
               <dict>
                   <key>name</key>
-                  <string>string.name.directory.kate_documents</string>
+                  <string>string.name.directory.opened_files</string>
               </dict>
               <key>4</key>
               <dict>
                   <key>name</key>
-                  <string>punctuation.definition.directory.slash.kate_documents</string>
+                  <string>punctuation.definition.directory.slash.opened_files</string>
               </dict>
               <key>5</key>
                   <dict>
                       <key>name</key>
-                      <string>string.error.kate_documents</string>
+                      <string>string.error.opened_files</string>
                   </dict>
           </dict>
       </dict>
@@ -54,7 +54,7 @@
           <key>match</key>
           <string>^(\s*)(≡ )(\S.*?(\.[^\.\n]+)?)( \(.*\))?$</string>
           <key>name</key>
-          <string>kate_documents.item.file</string>
+          <string>opened_files.item.file</string>
           <key>captures</key>
           <dict>
               <key>1</key>
@@ -65,22 +65,22 @@
               <key>2</key>
               <dict>
                   <key>name</key>
-                  <string>punctuation.definition.file.symbol.kate_documents</string>
+                  <string>punctuation.definition.file.symbol.opened_files</string>
               </dict>
               <key>3</key>
               <dict>
                   <key>name</key>
-                  <string>string.name.file.kate_documents</string>
+                  <string>string.name.file.opened_files</string>
               </dict>
               <key>4</key>
               <dict>
                   <key>name</key>
-                  <string>string.name.file.extension.kate_documents</string>
+                  <string>string.name.file.extension.opened_files</string>
               </dict>
               <key>5</key>
               <dict>
                   <key>name</key>
-                  <string>string.name.file.view_id.kate_documents</string>
+                  <string>string.name.file.view_id.opened_files</string>
               </dict>
           </dict>
       </dict>
@@ -89,13 +89,13 @@
           <key>match</key>
           <string>^⠤(\s*\[.+\]){0,1}$</string>
           <key>name</key>
-          <string>kate_documents.item.parent_dir</string>
+          <string>opened_files.item.parent_dir</string>
           <key>captures</key>
           <dict>
               <key>1</key>
               <dict>
                   <key>name</key>
-                  <string>punctuation.definition.rename_mode.kate_documents</string>
+                  <string>punctuation.definition.rename_mode.opened_files</string>
               </dict>
           </dict>
       </dict>
@@ -106,23 +106,23 @@
           <key>end</key>
           <string>^(—+)(\[RENAME MODE\]){0,1}(—*)\n</string>
           <key>name</key>
-          <string>header.kate_documents</string>
+          <string>header.opened_files</string>
           <key>endCaptures</key>
           <dict>
               <key>1</key>
               <dict>
                   <key>name</key>
-                  <string>punctuation.definition.separator.kate_documents</string>
+                  <string>punctuation.definition.separator.opened_files</string>
               </dict>
               <key>2</key>
               <dict>
                   <key>name</key>
-                  <string>punctuation.definition.rename_mode.kate_documents</string>
+                  <string>punctuation.definition.rename_mode.opened_files</string>
               </dict>
               <key>3</key>
               <dict>
                   <key>name</key>
-                  <string>punctuation.definition.separator.kate_documents</string>
+                  <string>punctuation.definition.separator.opened_files</string>
               </dict>
           </dict>
       </dict>

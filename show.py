@@ -19,7 +19,7 @@ def first(seq, pred):
     return next((item for item in seq if pred(item)), None)
 
 def set_proper_scheme(view):
-    settings = sublime.load_settings('kate_documents.sublime-settings')
+    settings = sublime.load_settings('opened_files.sublime-settings')
     if view.settings().get('color_scheme') == settings.get('color_scheme'):
         return
     view.settings().set('color_scheme', settings.get('color_scheme'))
@@ -94,13 +94,13 @@ def set_view(view_id, window, ignore_existing, path, single_pane):
         # See if a view for this path already exists.
         same_path = lambda v: v.settings().get('dired_path') == path
         # See if any reusable view exists in case of single_pane argument
-        any_path = lambda v: v.score_selector(0, "text.kate_documents") > 0
+        any_path = lambda v: v.score_selector(0, "text.opened_files") > 0
         view = first(window.views(), any_path if single_pane else same_path)
 
     if not view:
         view = window.new_file()
         view.settings().add_on_change('color_scheme', lambda: set_proper_scheme(view))
-        view.set_syntax_file('Packages/KateDocuments/kate_documents' + SYNTAX_EXTENSION)
+        view.set_syntax_file('Packages/OpenedFiles/opened_files' + SYNTAX_EXTENSION)
         view.set_scratch(True)
         reset_sels = True
     else:
@@ -116,7 +116,7 @@ def show(window, path, view_id=None, ignore_existing=False, single_pane=False, g
     if other_group:
         prev_focus = window.active_view()
         # simulate 'toggle sidebar':
-        if prev_focus and 'kate_documents' in prev_focus.scope_name(0):
+        if prev_focus and 'opened_files' in prev_focus.scope_name(0):
             # window.run_command('close_file')
             return prev_focus #don't close the view - we can use it again
 
@@ -141,7 +141,7 @@ def show(window, path, view_id=None, ignore_existing=False, single_pane=False, g
         name = u"■ {0}".format(view_name)
 
     view.set_name(name)
-    view.settings().set('kate_documents_type', True)
+    view.settings().set('opened_files_type', True)
 
     # forcibly shoot on_activated, because when view was created it didnot have any settings
     window.show_quick_panel(['a', 'b'], None)
