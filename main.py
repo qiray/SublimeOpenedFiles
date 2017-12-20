@@ -69,10 +69,10 @@ class OpenedFilesCommand(sublime_plugin.TextCommand): #view.run_command('opened_
 
         temp = []
         for view in view_list:
-            s = view.settings()
-            if s.get("opened_files_type"):
+            settings = view.settings()
+            if settings.get("opened_files_type"):
                 OPENED_FILES_VIEW = view.id()
-            elif s.get('dired_path'):
+            elif settings.get('dired_path'):
                 pass
             else:
                 temp.append(view)
@@ -82,7 +82,7 @@ class OpenedFilesCommand(sublime_plugin.TextCommand): #view.run_command('opened_
         draw_tree(window, edit, tree)
 
 class OpenedFilesActCommand(sublime_plugin.TextCommand):
-    def run(self, edit, act = 'default'):
+    def run(self, edit, act='default'):
         selection = self.view.sel()[0]
         self.open_file(edit, selection, act)
 
@@ -111,6 +111,8 @@ class OpenedFilesActCommand(sublime_plugin.TextCommand):
             draw_tree(window, edit, tree)
         elif act == 'unfold' and len(node.children) > 0:
             goto_linenumber = tree.nodes[sorted(node.children)[0]].stringnum
+        if goto_linenumber == '':
+            goto_linenumber = row + 1
         self.view.run_command("goto_line", {"line": goto_linenumber})
 
 class OpenedFilesOpenExternalCommand(sublime_plugin.TextCommand):
@@ -123,7 +125,7 @@ class OpenedFilesOpenExternalCommand(sublime_plugin.TextCommand):
         node = tree.nodes[action['id']]
         self.view.window().run_command("open_dir", {"dir": node.node_id})        
 
-# MOUSE ACTIONS ##############################################
+# MOUSE ACTIONS:
 
 def mouse_click_actions(view, args):
     s = view.settings()
@@ -151,13 +153,38 @@ else:
         def run_(self, args):
             mouse_click_actions(self.view, args)
 
-#TODO: add event listener for open/close/new tabs
-# class SampleListener(sublime_plugin.EventListener):
-#     def on_load(self, view):
-#         view.run_command('opened_files')
+# Event listners
 
-#     def on_pre_close(self, view):
-#         print('Closing!' + view.name())
-#         s = view.settings()`
-#         if not s.get("opened_files_type"):
-#             view.run_command('opened_files')
+def get_opened_files_view():
+    windows = sublime.windows()#[0].views()
+    for win in windows:
+        views = win.views()
+        if OPENED_FILES_VIEW is not None:
+            view = first(views, lambda v: v.id() == OPENED_FILES_VIEW)
+        else:
+            view = first(views, lambda v: v.settings().get("opened_files_type"))
+        if view is not None:
+            return view
+    return None
+
+def update_opened_files_view(): #TODO: save fold/unfold status and don't save view
+    view = get_opened_files_view()
+    if view is not None:
+        view.run_command('opened_files')
+
+class SampleListener(sublime_plugin.EventListener):
+    def on_close(self, view):
+        update_opened_files_view()
+
+    def on_new(self, view):
+        update_opened_files_view()
+
+    def on_load(self, view):
+        update_opened_files_view()
+
+    def on_clone(self, view):
+        update_opened_files_view()
+
+def plugin_loaded(): #this function autoruns on plugin loaded
+    view = get_opened_files_view()
+    view.run_command('opened_files')
