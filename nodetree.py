@@ -52,6 +52,14 @@ class Tree(object):
         self.parents = {}
         self.actions_map = ActionsMap()
 
+    def get_node(self, node_id):
+        if node_id in self.nodes:
+            return self.nodes[node_id]
+        return None
+
+    def set_node(self, node_id, node):
+        self.nodes[node_id] = node
+
     def add_filename(self, filename, view_id, is_file):
         arr = filename.split(os.sep)
         length = len(arr)
@@ -60,8 +68,6 @@ class Tree(object):
             self.nodes[newname] = Node(newname, {}, 'file', None, view_id)
             self.parents[newname] = True
             return
-        if arr[0] == '':
-            arr[0] = os.sep
         if not arr[0] in self.parents:
             self.parents[arr[0]] = True
         for i in range(1, length + 1):

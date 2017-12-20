@@ -25,25 +25,6 @@ def set_proper_scheme(view):
     view.settings().set('color_scheme', settings.get('color_scheme'))
 
 def calc_width(view):
-    '''
-    return float width, which must be
-        0.0 < width < 1.0 (other values acceptable, but cause unfriendly layout)
-    used in show.show() and "dired_select" command with other_group=True
-    '''
-    # width = view.settings().get('dired_width', 0.3)
-    # if isinstance(width, float):
-    #     width -= width//1  # must be less than 1
-    # elif isinstance(width, int if ST3 else long):  # assume it is pixels
-    #     wport = view.viewport_extent()[0]
-    #     width = 1 - round((wport - width) / wport, 2)
-    #     if width >= 1:
-    #         width = 0.9
-    # else:
-    #     sublime.error_message(u'FileBrowser:\n\ndired_width set to '
-    #                           u'unacceptable type "%s", please change it.\n\n'
-    #                           u'Fallback to default 0.3 for now.' % type(width))
-    #     width = 0.3
-    # return width or 0.1  # avoid 0.0
     return 0.2 #default value
 
 def get_group(groups, nag):
@@ -147,5 +128,6 @@ def show(window, path, view_id=None, ignore_existing=False, single_pane=False, g
     window.show_quick_panel(['a', 'b'], None)
     # view.run_command('dired_refresh', {'goto': goto, 'reset_sels': reset_sels})
     window.run_command('hide_overlay')
-    window.focus_view(view)
+    if view_id is None:
+        window.focus_view(view)
     return view

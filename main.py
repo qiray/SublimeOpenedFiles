@@ -36,12 +36,18 @@ def view_name(view):
         result = name
     return result
 
-def generate_tree(view_list):
-    localtree = Tree()
+def generate_tree(view_list, localtree):
+    result = Tree()
     for view in view_list:
         name = view_name(view)
-        localtree.add_filename(name, view.id(), is_file=False if view.file_name() is None else True)
-    return localtree
+        node = localtree.get_node(name)
+        if node:
+            #TODO: solve this and check focus for new file/reopen etc
+            # result.set_node(name, node)
+            result.add_filename(name, view.id(), is_file=False if view.file_name() is None else True)
+        else:
+            result.add_filename(name, view.id(), is_file=False if view.file_name() is None else True)
+    return result
 
 def draw_tree(window, edit, tree):
     global OPENED_FILES_VIEW
@@ -78,7 +84,7 @@ class OpenedFilesCommand(sublime_plugin.TextCommand): #view.run_command('opened_
                 temp.append(view)
         view_list = temp
 
-        tree = generate_tree(view_list)
+        tree = generate_tree(view_list, tree)
         draw_tree(window, edit, tree)
 
 class OpenedFilesActCommand(sublime_plugin.TextCommand):
@@ -98,7 +104,7 @@ class OpenedFilesActCommand(sublime_plugin.TextCommand):
         goto_linenumber = row + 1
         if action['action'] == 'file' and act == 'default':
             view = first(window.views(), lambda v: v.id() == action['view_id'])
-            window.focus_view(view)   
+            window.focus_view(view)
         elif action['action'] == 'fold' and act != 'unfold':
             tree.nodes[action['id']].status = 'unfold'
             draw_tree(window, edit, tree)
@@ -109,7 +115,7 @@ class OpenedFilesActCommand(sublime_plugin.TextCommand):
             goto_linenumber = tree.nodes[node.parent].stringnum
             tree.nodes[node.parent].status = 'unfold'
             draw_tree(window, edit, tree)
-        elif act == 'unfold' and len(node.children) > 0:
+        elif act == 'unfold' and node.children:
             goto_linenumber = tree.nodes[sorted(node.children)[0]].stringnum
         if goto_linenumber == '':
             goto_linenumber = row + 1
@@ -167,7 +173,7 @@ def get_opened_files_view():
             return view
     return None
 
-def update_opened_files_view(): #TODO: save fold/unfold status and don't save view
+def update_opened_files_view(): #TODO: save fold/unfold status
     view = get_opened_files_view()
     if view is not None:
         view.run_command('opened_files')
@@ -187,4 +193,5 @@ class SampleListener(sublime_plugin.EventListener):
 
 def plugin_loaded(): #this function autoruns on plugin loaded
     view = get_opened_files_view()
-    view.run_command('opened_files')
+    if view is not None:
+        view.run_command('opened_files')
