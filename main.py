@@ -11,19 +11,21 @@ VERSION_REVISION = 0
 ST3 = int(sublime.version()) >= 3000
 OPENED_FILES_VIEW = None
 
-#TODO: open/reopen files in other tab
 #TODO: prevent from showing filebrowser view when open/reopen
 #TODO: show files after all filetrees
 #TODO: add listview along with treeview (like in Atom editor)
 #TODO: add max depth (like in Kate editor)
 #TODO: goto line with new opened file
+#TODO: test plugin in right group
 
 if ST3:
     from .show import show, first
     from .nodetree import Tree
+    SYNTAX_EXTENSION = '.sublime-syntax'
 else:  # ST2 imports
     from show import show, first
     from nodetree import Tree
+    SYNTAX_EXTENSION = '.hidden-tmLanguage'
 
 tree = Tree()
 
@@ -189,18 +191,26 @@ class OpenedFilesListener(sublime_plugin.EventListener):
         update_opened_files_view()
 
     def on_new(self, view):
-        print(0)
+        w = sublime.active_window()
+        num_groups = w.num_groups()
+        if num_groups >= 2:
+            for i in range(0, num_groups):
+                if not is_any_opened_files_in_group(w, i):
+                    w.set_view_index(view, i, len(w.views_in_group(i)))
+                    break
         update_opened_files_view()
 
     def on_load(self, view):
-        print(1)
-        update_opened_files_view()
+        self.on_new(view)
 
     def on_clone(self, view):
-        print(2)
-        update_opened_files_view()
+        self.on_new(view)
 
 def plugin_loaded(): #this function autoruns on plugin loaded
     view = get_opened_files_view()
     if view is not None:
         view.run_command('opened_files')
+
+def is_any_opened_files_in_group(window, group):
+    syntax = 'Packages/OpenedFiles/opened_files%s' % SYNTAX_EXTENSION
+    return any(v.settings().get('syntax') == syntax for v in window.views_in_group(group))
