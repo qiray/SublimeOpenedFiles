@@ -5,8 +5,8 @@ import sublime
 import sublime_plugin
 
 VERSION_MAJOR = 0
-VERSION_MINOR = 0
-VERSION_REVISION = 3
+VERSION_MINOR = 1
+VERSION_REVISION = 0
 
 ST3 = int(sublime.version()) >= 3000
 OPENED_FILES_VIEW = None
@@ -16,6 +16,7 @@ OPENED_FILES_VIEW = None
 #TODO: show files after all filetrees
 #TODO: add listview along with treeview (like in Atom editor)
 #TODO: add max depth (like in Kate editor)
+#TODO: goto line with new opened file
 
 if ST3:
     from .show import show, first
@@ -183,17 +184,20 @@ def update_opened_files_view():
     if view:
         view.run_command('opened_files')
 
-class SampleListener(sublime_plugin.EventListener):
+class OpenedFilesListener(sublime_plugin.EventListener):
     def on_close(self, view):
         update_opened_files_view()
 
     def on_new(self, view):
+        print(0)
         update_opened_files_view()
 
     def on_load(self, view):
+        print(1)
         update_opened_files_view()
 
     def on_clone(self, view):
+        print(2)
         update_opened_files_view()
 
 def plugin_loaded(): #this function autoruns on plugin loaded
