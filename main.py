@@ -6,34 +6,33 @@ import sublime_plugin
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 1
-VERSION_REVISION = 0
+VERSION_REVISION = 1
 
 ST3 = int(sublime.version()) >= 3000
 OPENED_FILES_VIEW = None
 
-#TODO: show files after all filetrees
-#TODO: add listview along with treeview (like in Atom editor)
 #TODO: add max depth (like in Kate editor)
+#TODO: add settings
 #TODO: goto line with new opened file
 #TODO: test plugin in right group
+#TODO: don't use global variables
 
 if ST3:
+    from .common import untitled_name, debug, SYNTAX_EXTENSION
     from .show import show, first
-    from .nodetree import Tree
-    SYNTAX_EXTENSION = '.sublime-syntax'
+    from .treeview import Tree
+    from .listview import List
 else:  # ST2 imports
+    from common import untitled_name, debug, SYNTAX_EXTENSION
     from show import show, first
-    from nodetree import Tree
-    SYNTAX_EXTENSION = '.hidden-tmLanguage'
+    from treeview import Tree
+    from listview import List
 
 tree = Tree()
-
-def debug(level, *args):
-    if level <= OpenedFilesCommand.debug_level:
-        print('[DEBUG]', level, args)
+files_list = List()
 
 def view_name(view):
-    result = OpenedFilesCommand.untitled_name
+    result = untitled_name
     filename = view.file_name()
     name = view.name()
     if filename is not None and filename != '':
@@ -56,7 +55,14 @@ def generate_tree(view_list, localtree):
             result.set_node(n, new_node)
     return result
 
-def draw_tree(window, edit, tree):
+def generate_list(view_list):
+    result = List()
+    for view in view_list:
+        name = view_name(view)
+        result.add_filename(name, view.id(), is_file=False if view.file_name() is None else True)
+    return result
+
+def draw_view(window, edit, object):
     global OPENED_FILES_VIEW
 
     view = show(window, 'Documents', view_id=OPENED_FILES_VIEW, other_group=True)
@@ -66,17 +72,15 @@ def draw_tree(window, edit, tree):
     OPENED_FILES_VIEW = view.id()
     view.set_read_only(False) #Enable edit for pasting result
     view.erase(edit, sublime.Region(0, view.size())) #clear view content
-    view.insert(edit, 0, str(tree)) #paste result tree
+    view.insert(edit, 0, str(object)) #paste result
     view.set_read_only(True) #Disable edit
 
 class OpenedFilesCommand(sublime_plugin.TextCommand): #view.run_command('opened_files')
-    
-    untitled_name = 'untitled' #const
-    debug_level = 1
 
     def run(self, edit):
         global OPENED_FILES_VIEW
         global tree
+        global files_list
         window = self.view.window()
         view_list = window.views()
 
@@ -91,8 +95,13 @@ class OpenedFilesCommand(sublime_plugin.TextCommand): #view.run_command('opened_
                 temp.append(view)
         view_list = temp
 
-        tree = generate_tree(view_list, tree)
-        draw_tree(window, edit, tree)
+        plugin_settings = sublime.load_settings('opened_files.sublime-settings')
+        if plugin_settings.get('tree_view'): #treeview
+            tree = generate_tree(view_list, tree)
+            draw_view(window, edit, tree)
+        else: #listview
+            files_list = generate_list(view_list)
+            draw_view(window, edit, files_list)
 
 class OpenedFilesActCommand(sublime_plugin.TextCommand):
     def run(self, edit, act='default'):
@@ -101,8 +110,16 @@ class OpenedFilesActCommand(sublime_plugin.TextCommand):
 
     def open_file(self, edit, selection, act):
         global tree
+        global files_list
         window = self.view.window()
         (row, col) = self.view.rowcol(selection.begin())
+
+        plugin_settings = sublime.load_settings('opened_files.sublime-settings')
+        if not plugin_settings.get('tree_view'): #list view
+            view_id = files_list.get_view_id(row + 1)
+            view = first(window.views(), lambda v: v.id() == view_id)
+            window.focus_view(view)
+            goto_linenumber = row + 1
 
         action = tree.get_action(row)
         if action is None:

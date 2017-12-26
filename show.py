@@ -10,9 +10,9 @@ from os.path import basename
 ST3 = int(sublime.version()) >= 3000
 
 if ST3:
-    SYNTAX_EXTENSION = '.sublime-syntax'
-else:
-    SYNTAX_EXTENSION = '.hidden-tmLanguage'
+    from .common import SYNTAX_EXTENSION
+else:  # ST2 imports
+    from common import SYNTAX_EXTENSION
 
 def first(seq, pred):
     '''similar to built-in any() but return the object instead of boolean'''

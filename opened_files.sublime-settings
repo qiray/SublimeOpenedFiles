@@ -1,34 +1,5 @@
 {
-
-  // How should be positioned the Browse Mode view opened when jumping
-  // "left": the default, open the view on the left
-  // "right": open the view on the right
-  // true: take all space available
-  // false: don’t open any view
-  "dired_open_on_jump": "left",
-
-  // true: keep the active window if empty when jumping
-  // false: the default, always open a new window when jumping
-  "dired_smart_jump": false,
-
-  // Width for FileBrowser column (as sidebar) accepts float or int:
-  // float  0.1-0.9   put 1 is a window width, so e.g. 0.5 is half of window
-  // int    e.g. 99   pixels, if value will be more than current window width
-  //                  then value will be treated as 0.9
-  "dired_width": 0.3,
-
-  // Automatically refresh view(s) in case of any changes in open directories
-  "dired_autorefresh": true,
-
-  // Automatically disable Vintageous to avoid keybindings incompatibilities;
-  // note it is Vintageous setting, if it does not work you should report into
-  // appropriate repository https://github.com/guillermooo/Vintageous/issues
-  "__vi_external_disable": true,
-
-  // The rest of these settings are normal sublime settings to
-  // make FileBrowser views look more like a file browser than an editor
-  // This plugin does not change font and font size, but it's
-  // highly recommended to customize them in your user files.
+  "tree_view": true,
   "color_scheme": "Packages/OpenedFiles/opened_files.hidden-tmTheme",
   "line_numbers": false,
   "word_wrap": false,
@@ -39,9 +10,6 @@
   "drag_text": false,
   "highlight_line": true,
   "margin": 0,
-  "tab_size": 3,
+  "tab_size": 2,
   "rulers": [],
-  "caret_extra_width": 0, // extra caret width causes partially hidden chars
-  // "font_face": "sans-serif",
-  // "font_size": 9,
 }

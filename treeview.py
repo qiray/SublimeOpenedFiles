@@ -50,6 +50,7 @@ class Tree(object):
     def __init__(self):
         self.nodes = {}
         self.parents = {}
+        self.opened_views = {}
         self.actions_map = ActionsMap()
 
     def get_nodes(self):
@@ -68,8 +69,9 @@ class Tree(object):
         length = len(arr)
         if not is_file:
             newname = '{} (id = {})'.format(filename, view_id)
-            self.nodes[newname] = Node(newname, {}, 'file', None, view_id)
-            self.parents[newname] = True
+            node = Node(newname, {}, 'file', None, view_id)
+            self.nodes[newname] = node
+            self.opened_views[newname] = node
             return
         if not arr[0] in self.parents:
             self.parents[arr[0]] = True
@@ -81,7 +83,7 @@ class Tree(object):
                     self.nodes[name].add_child(child)
                 else:
                     self.nodes[name] = Node(name, {child : True}, 'fold', os.sep.join(arr[:i - 1]))
-            else:
+            else: 
                 self.nodes[name] = Node(name, {}, 'file', os.sep.join(arr[:i - 1]), view_id)
 
     def __str__(self):
@@ -102,6 +104,9 @@ class Tree(object):
         stringnum = 1
         for name in printed_parents:
             temp, stringnum = self.nodes[name].print_children(self.nodes, self.actions_map, 0, stringnum)
+            result += temp
+        for name in self.opened_views:
+            temp, stringnum = self.opened_views[name].print_children(self.opened_views, self.actions_map, 0, stringnum)
             result += temp
         return result
 
