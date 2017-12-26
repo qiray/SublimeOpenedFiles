@@ -120,6 +120,7 @@ class OpenedFilesActCommand(sublime_plugin.TextCommand):
             view = first(window.views(), lambda v: v.id() == view_id)
             window.focus_view(view)
             goto_linenumber = row + 1
+            return
 
         action = tree.get_action(row)
         if action is None:
