@@ -11,7 +11,6 @@ VERSION_REVISION = 0
 ST3 = int(sublime.version()) >= 3000
 OPENED_FILES_VIEW = None
 
-#TODO: prevent from showing filebrowser view when open/reopen
 #TODO: show files after all filetrees
 #TODO: add listview along with treeview (like in Atom editor)
 #TODO: add max depth (like in Kate editor)
@@ -187,15 +186,27 @@ def update_opened_files_view():
         view.run_command('opened_files')
 
 class OpenedFilesListener(sublime_plugin.EventListener):
+    current_view = None
+
+    def on_activated(self, view): #save last opened documents or dired view
+        settings = view.settings()
+        if settings.get("opened_files_type") or settings.get('dired_path'):
+            self.current_view = view
+
     def on_close(self, view):
         update_opened_files_view()
 
     def on_new(self, view):
+        opened_view = get_opened_files_view()
+        if not opened_view:
+            return
         w = sublime.active_window()
+        active_view = w.active_view()
         num_groups = w.num_groups()
         if num_groups >= 2:
             for i in range(0, num_groups):
                 if not is_any_opened_files_in_group(w, i):
+                    w.focus_view(self.current_view) #focus on dired/opened documents view to prevent from strange views' switching
                     w.set_view_index(view, i, len(w.views_in_group(i)))
                     break
         update_opened_files_view()
