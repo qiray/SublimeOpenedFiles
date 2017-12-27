@@ -9,13 +9,11 @@ VERSION_MINOR = 1
 VERSION_REVISION = 1
 
 ST3 = int(sublime.version()) >= 3000
-OPENED_FILES_VIEW = None
 
+#TODO: add comments
 #TODO: add max depth (like in Kate editor)
 #TODO: add settings
-#TODO: goto line with new opened file
 #TODO: test plugin in right group
-#TODO: don't use global variables
 
 if ST3:
     from .common import untitled_name, debug, SYNTAX_EXTENSION
@@ -27,9 +25,6 @@ else:  # ST2 imports
     from show import show, first
     from treeview import Tree
     from listview import List
-
-tree = Tree()
-files_list = List()
 
 def view_name(view):
     result = untitled_name
@@ -62,25 +57,25 @@ def generate_list(view_list):
         result.add_filename(name, view.id(), is_file=False if view.file_name() is None else True)
     return result
 
-def draw_view(window, edit, object):
-    global OPENED_FILES_VIEW
+def draw_view(window, edit, view_object):
 
-    view = show(window, 'Documents', view_id=OPENED_FILES_VIEW, other_group=True)
+    view = show(window, 'Documents', view_id=OpenedFilesCommand.OPENED_FILES_VIEW, other_group=True)
     if not view:
-        OPENED_FILES_VIEW = None
+        OpenedFilesCommand.OPENED_FILES_VIEW = None
         return
-    OPENED_FILES_VIEW = view.id()
+    OpenedFilesCommand.OPENED_FILES_VIEW = view.id()
     view.set_read_only(False) #Enable edit for pasting result
     view.erase(edit, sublime.Region(0, view.size())) #clear view content
-    view.insert(edit, 0, str(object)) #paste result
+    view.insert(edit, 0, str(view_object)) #paste result
     view.set_read_only(True) #Disable edit
 
 class OpenedFilesCommand(sublime_plugin.TextCommand): #view.run_command('opened_files')
 
+    OPENED_FILES_VIEW = None
+    tree = Tree()
+    files_list = List()
+
     def run(self, edit):
-        global OPENED_FILES_VIEW
-        global tree
-        global files_list
         window = self.view.window()
         view_list = window.views()
 
@@ -88,7 +83,7 @@ class OpenedFilesCommand(sublime_plugin.TextCommand): #view.run_command('opened_
         for view in view_list:
             settings = view.settings()
             if settings.get("opened_files_type"):
-                OPENED_FILES_VIEW = view.id()
+                OpenedFilesCommand.OPENED_FILES_VIEW = view.id()
             elif settings.get('dired_path'):
                 pass
             else:
@@ -97,11 +92,11 @@ class OpenedFilesCommand(sublime_plugin.TextCommand): #view.run_command('opened_
 
         plugin_settings = sublime.load_settings('opened_files.sublime-settings')
         if plugin_settings.get('tree_view'): #treeview
-            tree = generate_tree(view_list, tree)
-            draw_view(window, edit, tree)
+            OpenedFilesCommand.tree = generate_tree(view_list, OpenedFilesCommand.tree)
+            draw_view(window, edit, OpenedFilesCommand.tree)
         else: #listview
-            files_list = generate_list(view_list)
-            draw_view(window, edit, files_list)
+            OpenedFilesCommand.files_list = generate_list(view_list)
+            draw_view(window, edit, OpenedFilesCommand.files_list)
 
 class OpenedFilesActCommand(sublime_plugin.TextCommand):
     def run(self, edit, act='default'):
@@ -109,39 +104,37 @@ class OpenedFilesActCommand(sublime_plugin.TextCommand):
         self.open_file(edit, selection, act)
 
     def open_file(self, edit, selection, act):
-        global tree
-        global files_list
         window = self.view.window()
         (row, col) = self.view.rowcol(selection.begin())
 
         plugin_settings = sublime.load_settings('opened_files.sublime-settings')
         if not plugin_settings.get('tree_view'): #list view
-            view_id = files_list.get_view_id(row + 1)
+            view_id = OpenedFilesCommand.files_list.get_view_id(row + 1)
             view = first(window.views(), lambda v: v.id() == view_id)
             window.focus_view(view)
             goto_linenumber = row + 1
             return
 
-        action = tree.get_action(row)
+        action = OpenedFilesCommand.tree.get_action(row)
         if action is None:
             return
-        node = tree.nodes[action['id']]
+        node = OpenedFilesCommand.tree.nodes[action['id']]
         goto_linenumber = row + 1
         if action['action'] == 'file' and act == 'default':
             view = first(window.views(), lambda v: v.id() == action['view_id'])
             window.focus_view(view)
         elif action['action'] == 'fold' and act != 'unfold':
-            tree.nodes[action['id']].status = 'unfold'
-            draw_tree(window, edit, tree)
+            OpenedFilesCommand.tree.nodes[action['id']].status = 'unfold'
+            draw_view(window, edit, OpenedFilesCommand.tree)
         elif action['action'] == 'unfold' and act != 'fold':
-            tree.nodes[action['id']].status = 'fold'
-            draw_tree(window, edit, tree)
+            OpenedFilesCommand.tree.nodes[action['id']].status = 'fold'
+            draw_view(window, edit, OpenedFilesCommand.tree)
         elif act == 'fold' and node.parent is not None and node.parent != '':
-            goto_linenumber = tree.nodes[node.parent].stringnum
-            tree.nodes[node.parent].status = 'unfold'
-            draw_tree(window, edit, tree)
+            goto_linenumber = OpenedFilesCommand.tree.nodes[node.parent].stringnum
+            OpenedFilesCommand.tree.nodes[node.parent].status = 'unfold'
+            draw_view(window, edit, OpenedFilesCommand.tree)
         elif act == 'unfold' and node.children:
-            goto_linenumber = tree.nodes[sorted(node.children)[0]].stringnum
+            goto_linenumber = OpenedFilesCommand.tree.nodes[sorted(node.children)[0]].stringnum
         if goto_linenumber == '':
             goto_linenumber = row + 1
         self.view.run_command("goto_line", {"line": goto_linenumber})
@@ -150,11 +143,11 @@ class OpenedFilesOpenExternalCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         selection = self.view.sel()[0]
         (row, col) = self.view.rowcol(selection.begin())
-        action = tree.get_action(row)
+        action = OpenedFilesCommand.tree.get_action(row)
         if action is None:
             return
-        node = tree.nodes[action['id']]
-        self.view.window().run_command("open_dir", {"dir": node.node_id})        
+        node = OpenedFilesCommand.tree.nodes[action['id']]
+        self.view.window().run_command("open_dir", {"dir": node.node_id})
 
 # MOUSE ACTIONS:
 
@@ -190,8 +183,8 @@ def get_opened_files_view():
     windows = sublime.windows()#[0].views()
     for win in windows:
         views = win.views()
-        if OPENED_FILES_VIEW is not None:
-            view = first(views, lambda v: v.id() == OPENED_FILES_VIEW)
+        if OpenedFilesCommand.OPENED_FILES_VIEW is not None:
+            view = first(views, lambda v: v.id() == OpenedFilesCommand.OPENED_FILES_VIEW)
         else:
             view = first(views, lambda v: v.settings().get("opened_files_type"))
         if view:

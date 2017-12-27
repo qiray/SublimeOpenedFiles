@@ -6,9 +6,8 @@ import sublime
 
 ST3 = int(sublime.version()) >= 3000
 
-separator = '  '
-
 class Node(object):
+    separator = '  '
 
     def __init__(self, node_id, children, status, parent=None, view_id=None):
         self.node_id = node_id
@@ -33,7 +32,7 @@ class Node(object):
         return '≡ '+ arr[-1]
 
     def print_children(self, array, actions_map, length, stringnum):
-        result = separator*length + self.get_name() + '\n'
+        result = Node.separator*length + self.get_name() + '\n'
         self.stringnum = stringnum
         stringnum += 1
         actions_map.add_action(self)
@@ -83,7 +82,7 @@ class Tree(object):
                     self.nodes[name].add_child(child)
                 else:
                     self.nodes[name] = Node(name, {child : True}, 'fold', os.sep.join(arr[:i - 1]))
-            else: 
+            else:
                 self.nodes[name] = Node(name, {}, 'file', os.sep.join(arr[:i - 1]), view_id)
 
     def __str__(self):

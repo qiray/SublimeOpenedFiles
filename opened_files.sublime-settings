@@ -1,5 +1,6 @@
 {
   "tree_view": true,
+  "max_depth": 0,
   "color_scheme": "Packages/OpenedFiles/opened_files.hidden-tmTheme",
   "line_numbers": false,
   "word_wrap": false,
