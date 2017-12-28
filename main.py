@@ -219,6 +219,7 @@ class OpenedFilesListener(sublime_plugin.EventListener):
                 if not is_any_opened_files_in_group(w, i):
                     w.focus_view(self.current_view) #focus on dired/opened documents view to prevent from strange views' switching
                     w.set_view_index(view, i, len(w.views_in_group(i)))
+                    w.focus_view(view)
                     break
         update_opened_files_view()
 
