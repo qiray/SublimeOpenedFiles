@@ -12,8 +12,7 @@ ST3 = int(sublime.version()) >= 3000
 
 #TODO: add comments
 #TODO: add max depth (like in Kate editor)
-#TODO: add settings
-#TODO: test plugin in right group
+#TODO: test plugin in right group (add setting for left/right position)
 
 if ST3:
     from .common import untitled_name, debug, SYNTAX_EXTENSION

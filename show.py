@@ -48,7 +48,7 @@ def set_active_group(window, view, other_group, view_exist):
         groups = window.num_groups()
         if groups == 1:
             width = calc_width(view)
-            cols = [0.0, width, 1.0] if other_group == 'left' else [0.0, 1-width, 1.0]
+            cols = [0.0, width, 1.0] if other_group == 'left' else [0.0, 1 - width, 1.0]
             window.set_layout({"cols": cols, "rows": [0.0, 1.0], "cells": [[0, 0, 1, 1], [1, 0, 2, 1]]})
         elif view:
             group = get_group(groups, nag)

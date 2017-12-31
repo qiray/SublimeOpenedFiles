@@ -89,17 +89,26 @@ class Tree(object):
         result = ''
         self.actions_map.clear()
         printed_parents = sorted(self.parents) #dict here becomes list!
-        while len(printed_parents) == 1:
-            key = printed_parents[0]
-            templist = sorted(self.nodes[key].children)
-            flag = False
-            for filename in templist:
-                if self.nodes[filename].status == 'file':
-                    flag = True
+        plugin_settings = sublime.load_settings('opened_files.sublime-settings')
+        max_depth = plugin_settings.get('max_depth')
+        if max_depth is None or max_depth == 0:
+            while len(printed_parents) == 1:
+                key = printed_parents[0]
+                templist = sorted(self.nodes[key].children)
+                flag = False
+                for filename in templist:
+                    if self.nodes[filename].status == 'file':
+                        flag = True
+                        break
+                if flag:
                     break
-            if flag:
-                break
-            printed_parents = templist
+                printed_parents = templist
+        else:
+            files = []
+            for filename in self.nodes:
+                if self.nodes[filename].status == 'file':
+                    files.append(self.nodes[filename])
+            print (files)
         stringnum = 1
         for name in printed_parents:
             temp, stringnum = self.nodes[name].print_children(self.nodes, self.actions_map, 0, stringnum)
