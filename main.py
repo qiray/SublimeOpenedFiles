@@ -6,12 +6,11 @@ import sublime_plugin
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 1
-VERSION_REVISION = 1
+VERSION_REVISION = 2
 
 ST3 = int(sublime.version()) >= 3000
 
 #TODO: add comments
-#TODO: add max depth (like in Kate editor)
 #TODO: test plugin in right group (add setting for left/right position)
 
 if ST3:

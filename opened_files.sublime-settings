@@ -1,6 +1,17 @@
 {
+  /*
+  If true then show treeview else show listview.
+  */
   "tree_view": true,
-  "max_depth": 0,
+
+  /*
+  Values for tree view:
+  full - always show full path,
+  medium - show folders with the same level on the same indents,
+  default - don't show folders with only one child folder.
+  */
+  "tree_size": "default",
+  
   "color_scheme": "Packages/OpenedFiles/opened_files.hidden-tmTheme",
   "line_numbers": false,
   "word_wrap": false,

@@ -3,6 +3,7 @@
 
 import os
 import sublime
+import re
 
 ST3 = int(sublime.version()) >= 3000
 
@@ -16,6 +17,8 @@ class Node(object):
         self.status = status
         self.view_id = view_id
         self.stringnum = ''
+        self.max_parents = []
+        self.printed = False
 
     def add_child(self, child):
         if not child in self.children:
@@ -45,6 +48,7 @@ class Node(object):
         return result, stringnum
 
 class Tree(object):
+    tree_size = 0
 
     def __init__(self):
         self.nodes = {}
@@ -90,8 +94,10 @@ class Tree(object):
         self.actions_map.clear()
         printed_parents = sorted(self.parents) #dict here becomes list!
         plugin_settings = sublime.load_settings('opened_files.sublime-settings')
-        max_depth = plugin_settings.get('max_depth')
-        if max_depth is None or max_depth == 0:
+        Tree.tree_size = plugin_settings.get('tree_size')
+        if Tree.tree_size != 'default' and Tree.tree_size != 'full' and Tree.tree_size != 'medium':
+            Tree.tree_size = 'default'
+        if Tree.tree_size != 'full':
             while len(printed_parents) == 1:
                 key = printed_parents[0]
                 templist = sorted(self.nodes[key].children)
@@ -103,14 +109,16 @@ class Tree(object):
                 if flag:
                     break
                 printed_parents = templist
-        else:
-            files = []
-            for filename in self.nodes:
-                if self.nodes[filename].status == 'file':
-                    files.append(self.nodes[filename])
-            print (files)
         stringnum = 1
         for name in printed_parents:
+            if Tree.tree_size == 'default':
+                tempname = name
+                while len(self.nodes[tempname].children) == 1:
+                    tempname = sorted(self.nodes[tempname].children)[0]
+                    if self.nodes[tempname].status == 'file':
+                        tempname = self.nodes[tempname].parent
+                        break
+                name = tempname
             temp, stringnum = self.nodes[name].print_children(self.nodes, self.actions_map, 0, stringnum)
             result += temp
         for name in self.opened_views:
