@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-#TODO: add thanks to Sublime FileBrowser plugin (https://packagecontrol.io/packages/FileBrowser)
-
 import os
 import sublime
 from os.path import basename

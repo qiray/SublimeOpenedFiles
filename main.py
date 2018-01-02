@@ -5,13 +5,14 @@ import sublime
 import sublime_plugin
 
 VERSION_MAJOR = 0
-VERSION_MINOR = 1
-VERSION_REVISION = 2
+VERSION_MINOR = 9
+VERSION_REVISION = 0
 
 ST3 = int(sublime.version()) >= 3000
 
 #TODO: add comments
-#TODO: test plugin in right group (add setting for left/right position)
+#TODO: add thanks to Sublime FileBrowser plugin (https://packagecontrol.io/packages/FileBrowser)
+#TODO: write README file
 
 if ST3:
     from .common import untitled_name, debug, SYNTAX_EXTENSION
@@ -56,8 +57,11 @@ def generate_list(view_list):
     return result
 
 def draw_view(window, edit, view_object):
-
-    view = show(window, 'Documents', view_id=OpenedFilesCommand.OPENED_FILES_VIEW, other_group=True)
+    plugin_settings = sublime.load_settings('opened_files.sublime-settings')
+    group_position = plugin_settings.get('group_position')
+    if group_position != 'left' and group_position != 'right':
+        group_position = 'left'
+    view = show(window, 'Documents', view_id=OpenedFilesCommand.OPENED_FILES_VIEW, other_group=group_position)
     if not view:
         OpenedFilesCommand.OPENED_FILES_VIEW = None
         return
@@ -203,7 +207,19 @@ class OpenedFilesListener(sublime_plugin.EventListener):
             self.current_view = view
 
     def on_close(self, view):
-        update_opened_files_view()
+        if not 'opened_files' in view.scope_name(0):
+            update_opened_files_view()
+            return
+        w = sublime.active_window()
+        # check if closed view was a single one in group
+        if ST3:
+            single = not w.views_in_group(0) or not w.views_in_group(1)
+        else:
+            single = ([view.id()] == [v.id() for v in w.views_in_group(0)] or
+                      [view.id()] == [v.id() for v in w.views_in_group(1)])
+        if w.num_groups() == 2 and single:
+            # without timeout ST may crash
+            sublime.set_timeout(lambda: w.set_layout({"cols": [0.0, 1.0], "rows": [0.0, 1.0], "cells": [[0, 0, 1, 1]]}), 300)
 
     def on_new(self, view):
         opened_view = get_opened_files_view()

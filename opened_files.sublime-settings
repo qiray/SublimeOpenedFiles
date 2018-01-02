@@ -11,6 +11,11 @@
   default - don't show folders with only one child folder.
   */
   "tree_size": "default",
+
+  /*
+  Select group to show (left or right)
+  */
+  "group_position": "left",
   
   "color_scheme": "Packages/OpenedFiles/opened_files.hidden-tmTheme",
   "line_numbers": false,
