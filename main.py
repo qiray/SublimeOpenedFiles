@@ -6,7 +6,7 @@ import sublime_plugin
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 9
-VERSION_REVISION = 0
+VERSION_REVISION = 1
 
 ST3 = int(sublime.version()) >= 3000
 
@@ -241,6 +241,9 @@ class OpenedFilesListener(sublime_plugin.EventListener):
         self.on_new(view)
 
     def on_clone(self, view):
+        self.on_new(view)
+    
+    def on_post_save_async(self, view):
         self.on_new(view)
 
 def plugin_loaded(): #this function autoruns on plugin loaded
