@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# This file uses functions from Sublime FileBrowser plugin with MIT license - https://packagecontrol.io/packages/FileBrowser
+
 import os
 import sublime
 from os.path import basename

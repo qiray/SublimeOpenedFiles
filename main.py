@@ -1,17 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# This project uses some code and ideas from Sublime FileBrowser plugin with MIT license - https://packagecontrol.io/packages/FileBrowser
 
 import sublime
 import sublime_plugin
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 9
-VERSION_REVISION = 1
+VERSION_PATCH = 1
 
 ST3 = int(sublime.version()) >= 3000
 
+#TODO: test Ctrl-P
 #TODO: add comments
-#TODO: add thanks to Sublime FileBrowser plugin (https://packagecontrol.io/packages/FileBrowser)
 #TODO: write README file
 
 if ST3:
@@ -194,23 +195,45 @@ def get_opened_files_view():
     return None
 
 def update_opened_files_view():
+    print('Update!')
     view = get_opened_files_view()
     if view:
         view.run_command('opened_files')
 
+def is_transient_view(window, view): # from https://github.com/FichteFoll/FileHistory (MIT license)
+    if not ST3:
+        return False
+
+    if window.get_view_index(view)[1] == -1:
+        # If the view index is -1, then this can't be a real view.
+        # window.transient_view_in_group is not returning the correct
+        # value when we quickly cycle through the quick panel previews.
+        debug(1, "Detected possibly transient view with index = -1: '%s'"
+                   % view.file_name())
+        return True
+    return view == window.transient_view_in_group(window.active_group())
+
 class OpenedFilesListener(sublime_plugin.EventListener):
     current_view = None
+    current_depth = 1
 
     def on_activated(self, view): #save last opened documents or dired view
+        print(0)
+        print(view.settings().get('syntax') )
         settings = view.settings()
         if settings.get("opened_files_type") or settings.get('dired_path'):
             self.current_view = view
 
     def on_close(self, view):
+        print(1)
+        print(view.settings().get('syntax') )
+        w = sublime.active_window()
+        # if is_transient_view(w, view):
+        #     return
         if not 'opened_files' in view.scope_name(0):
+            print('closing')
             update_opened_files_view()
             return
-        w = sublime.active_window()
         # check if closed view was a single one in group
         if ST3:
             single = not w.views_in_group(0) or not w.views_in_group(1)
@@ -222,10 +245,12 @@ class OpenedFilesListener(sublime_plugin.EventListener):
             sublime.set_timeout(lambda: w.set_layout({"cols": [0.0, 1.0], "rows": [0.0, 1.0], "cells": [[0, 0, 1, 1]]}), 300)
 
     def on_new(self, view):
+        print(2)
         opened_view = get_opened_files_view()
-        if not opened_view:
-            return
         w = sublime.active_window()
+        # if not opened_view or is_transient_view(w, view):
+        #     print('return')
+        #     return
         active_view = w.active_view()
         num_groups = w.num_groups()
         if num_groups >= 2:
@@ -238,12 +263,15 @@ class OpenedFilesListener(sublime_plugin.EventListener):
         update_opened_files_view()
 
     def on_load(self, view):
+        print(3)
         self.on_new(view)
 
     def on_clone(self, view):
+        print(4)
         self.on_new(view)
-    
+
     def on_post_save_async(self, view):
+        print(5)
         self.on_new(view)
 
 def plugin_loaded(): #this function autoruns on plugin loaded

@@ -38,15 +38,29 @@
 
 		<dict>
 			<key>name</key>
-			<string>File/Dir Symbols</string>
+			<string>Dir Symbols</string>
 			<key>scope</key>
-			<string>punctuation.definition.directory.symbol.opened_files, punctuation.definition.file.symbol.opened_files, opened_files.item.parent_dir</string>
+			<string>punctuation.definition.directory.symbol.opened_files, opened_files.item.parent_dir</string>
 			<key>settings</key>
 			<dict>
 				<key>fontStyle</key>
 				<string>bold</string>
 				<key>foreground</key>
-				<string>#000000</string>
+				<string>#333333</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<key>name</key>
+			<string>File Symbols</string>
+			<key>scope</key>
+			<string>punctuation.definition.file.symbol.opened_files</string>
+			<key>settings</key>
+			<dict>
+				<key>fontStyle</key>
+				<string>bold</string>
+				<key>foreground</key>
+				<string>#D84444</string>
 			</dict>
 		</dict>
 
