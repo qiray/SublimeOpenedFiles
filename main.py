@@ -11,7 +11,6 @@ VERSION_PATCH = 1
 
 ST3 = int(sublime.version()) >= 3000
 
-#TODO: test Ctrl-P
 #TODO: add comments
 #TODO: write README file
 
@@ -195,7 +194,6 @@ def get_opened_files_view():
     return None
 
 def update_opened_files_view():
-    print('Update!')
     view = get_opened_files_view()
     if view:
         view.run_command('opened_files')
@@ -208,30 +206,29 @@ def is_transient_view(window, view): # from https://github.com/FichteFoll/FileHi
         # If the view index is -1, then this can't be a real view.
         # window.transient_view_in_group is not returning the correct
         # value when we quickly cycle through the quick panel previews.
-        debug(1, "Detected possibly transient view with index = -1: '%s'"
-                   % view.file_name())
         return True
     return view == window.transient_view_in_group(window.active_group())
 
 class OpenedFilesListener(sublime_plugin.EventListener):
     current_view = None
-    current_depth = 1
+    active_list = {}
 
     def on_activated(self, view): #save last opened documents or dired view
-        print(0)
-        print(view.settings().get('syntax') )
         settings = view.settings()
         if settings.get("opened_files_type") or settings.get('dired_path'):
             self.current_view = view
+            return
+        if not view.id() in OpenedFilesListener.active_list:
+            OpenedFilesListener.active_list[view.id()] = True
+            self.on_new(view)
 
     def on_close(self, view):
-        print(1)
-        print(view.settings().get('syntax') )
         w = sublime.active_window()
-        # if is_transient_view(w, view):
-        #     return
+        if is_transient_view(w, view) and not view.id() in OpenedFilesListener.active_list:
+            return
+        if view.id() in OpenedFilesListener.active_list:
+            OpenedFilesListener.active_list[view.id()] = False
         if not 'opened_files' in view.scope_name(0):
-            print('closing')
             update_opened_files_view()
             return
         # check if closed view was a single one in group
@@ -245,12 +242,10 @@ class OpenedFilesListener(sublime_plugin.EventListener):
             sublime.set_timeout(lambda: w.set_layout({"cols": [0.0, 1.0], "rows": [0.0, 1.0], "cells": [[0, 0, 1, 1]]}), 300)
 
     def on_new(self, view):
-        print(2)
         opened_view = get_opened_files_view()
         w = sublime.active_window()
-        # if not opened_view or is_transient_view(w, view):
-        #     print('return')
-        #     return
+        if not opened_view or is_transient_view(w, view):
+            return
         active_view = w.active_view()
         num_groups = w.num_groups()
         if num_groups >= 2:
@@ -263,15 +258,12 @@ class OpenedFilesListener(sublime_plugin.EventListener):
         update_opened_files_view()
 
     def on_load(self, view):
-        print(3)
         self.on_new(view)
 
     def on_clone(self, view):
-        print(4)
         self.on_new(view)
 
     def on_post_save_async(self, view):
-        print(5)
         self.on_new(view)
 
 def plugin_loaded(): #this function autoruns on plugin loaded
