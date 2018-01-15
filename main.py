@@ -61,7 +61,7 @@ def draw_view(window, edit, view_object):
     group_position = plugin_settings.get('group_position')
     if group_position != 'left' and group_position != 'right':
         group_position = 'left'
-    view = show(window, 'Documents', view_id=OpenedFilesCommand.OPENED_FILES_VIEW, other_group=group_position)
+    view = show(window, 'Opened Files', view_id=OpenedFilesCommand.OPENED_FILES_VIEW, other_group=group_position)
     if not view:
         OpenedFilesCommand.OPENED_FILES_VIEW = None
         return
