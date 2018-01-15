@@ -110,15 +110,23 @@ class Tree(object):
                     break
                 printed_parents = templist
         stringnum = 1
-        for name in printed_parents:
-            if Tree.tree_size == 'default':
+        if Tree.tree_size == 'default':
+            templist = []
+            for name in printed_parents:
                 tempname = name
+                flag = True
                 while len(self.nodes[tempname].children) == 1:
                     tempname = sorted(self.nodes[tempname].children)[0]
                     if self.nodes[tempname].status == 'file':
                         tempname = self.nodes[tempname].parent
+                        templist.append(tempname)
+                        flag = False
                         break
-                name = tempname
+                if flag:
+                    templist.append(tempname)
+            templist.sort(key=lambda x: x.split(os.sep)[-1].lower())
+            printed_parents = templist
+        for name in printed_parents:
             temp, stringnum = self.nodes[name].print_children(self.nodes, self.actions_map, 0, stringnum)
             result += temp
         for name in self.opened_views:
