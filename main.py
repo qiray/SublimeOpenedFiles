@@ -270,6 +270,13 @@ def plugin_loaded(): #this function autoruns on plugin loaded
     view = get_opened_files_view()
     if view is not None:
         view.run_command('opened_files')
+        window = view.window()
+        for v in window.views():
+            settings = v.settings()
+            if settings.get("opened_files_type") or settings.get('dired_path'):
+                continue
+            if not v.id() in OpenedFilesListener.active_list:
+                OpenedFilesListener.active_list[v.id()] = True
 
 def is_any_opened_files_in_group(window, group):
     syntax = 'Packages/OpenedFiles/opened_files%s' % SYNTAX_EXTENSION
