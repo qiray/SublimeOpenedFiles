@@ -1,1 +1,9 @@
-[]
+[
+	{
+		"keys": ["Cmd+f1"],
+		"command": "opened_files",
+		"args": {
+			"focus": true,
+		}
+	}
+]
