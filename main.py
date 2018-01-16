@@ -217,17 +217,17 @@ class OpenedFilesListener(sublime_plugin.EventListener):
     def on_activated(self, view): #save last opened documents or dired view
         settings = view.settings()
         if settings.get("opened_files_type"):
-            self.current_window = view.window()
+            OpenedFilesListener.current_window = view.window()
         if settings.get("opened_files_type") or settings.get('dired_path'):
             self.current_view = view
             return
-        if self.current_window == view.window() and not view.id() in OpenedFilesListener.active_list:
+        if OpenedFilesListener.current_window == view.window() and not view.id() in OpenedFilesListener.active_list:
             OpenedFilesListener.active_list[view.id()] = True
             self.on_new(view)
 
     def on_close(self, view):
         w = sublime.active_window()
-        if w != self.current_window or is_transient_view(w, view) and not view.id() in OpenedFilesListener.active_list:
+        if w != OpenedFilesListener.current_window or is_transient_view(w, view) and not view.id() in OpenedFilesListener.active_list:
             return
         if view.id() in OpenedFilesListener.active_list:
             OpenedFilesListener.active_list[view.id()] = False
@@ -247,7 +247,7 @@ class OpenedFilesListener(sublime_plugin.EventListener):
     def on_new(self, view):
         opened_view = get_opened_files_view()
         w = sublime.active_window()
-        if w != self.current_window or not opened_view or is_transient_view(w, view):
+        if w != OpenedFilesListener.current_window or not opened_view or is_transient_view(w, view):
             return
         active_view = w.active_view()
         num_groups = w.num_groups()
@@ -262,19 +262,19 @@ class OpenedFilesListener(sublime_plugin.EventListener):
 
     def on_load(self, view):
         w = sublime.active_window()
-        if w != self.current_window:
+        if w != OpenedFilesListener.current_window:
             return
         self.on_new(view)
 
     def on_clone(self, view):
         w = sublime.active_window()
-        if w != self.current_window:
+        if w != OpenedFilesListener.current_window:
             return
         self.on_new(view)
 
     def on_post_save_async(self, view):
         w = sublime.active_window()
-        if w != self.current_window:
+        if w != OpenedFilesListener.current_window:
             return
         self.on_new(view)
 
@@ -283,6 +283,7 @@ def plugin_loaded(): #this function autoruns on plugin loaded
     if view is not None:
         view.run_command('opened_files')
         window = view.window()
+        OpenedFilesListener.current_window = window
         for v in window.views():
             settings = v.settings()
             if settings.get("opened_files_type") or settings.get('dired_path'):
