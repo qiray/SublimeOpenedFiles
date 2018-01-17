@@ -7,7 +7,7 @@ import sublime_plugin
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 9
-VERSION_PATCH = 3
+VERSION_PATCH = 4
 
 ST3 = int(sublime.version()) >= 3000
 
