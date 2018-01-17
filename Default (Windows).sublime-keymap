@@ -1,6 +1,6 @@
 [
 	{
-		"keys": ["Ctrl+f1"],
+		"keys": ["ctrl+f1"],
 		"command": "opened_files",
 		"args": {
 			"focus": true,
