@@ -14,7 +14,9 @@ It has different settings and also can be shown on right or left side:
 
 ## Installation
 
-You can install this plugin by cloning this repo into your SublimeText Packages directory and rename it to `OpenedFiles`.
+You can install this plugin via [Sublime Package Control](https://packagecontrol.io/)
+
+Or by cloning this repo into your SublimeText Packages directory and rename it to `OpenedFiles`.
 
 ## Settings
 

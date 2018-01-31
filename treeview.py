@@ -42,6 +42,7 @@ class Node(object):
         if self.status == 'unfold':
             return result, stringnum
         children = sorted(self.children)
+        children.sort(key=lambda x: array[x].status == 'file')
         for child in children:
             temp, stringnum = array[child].print_children(array, actions_map, length + 1, stringnum)
             result += temp
@@ -93,6 +94,7 @@ class Tree(object):
         result = ''
         self.actions_map.clear()
         printed_parents = sorted(self.parents) #dict here becomes list!
+        printed_parents.sort(key=lambda x: self.nodes[x].status == 'file')
         plugin_settings = sublime.load_settings('opened_files.sublime-settings')
         Tree.tree_size = plugin_settings.get('tree_size')
         if Tree.tree_size != 'default' and Tree.tree_size != 'full' and Tree.tree_size != 'medium':
@@ -101,6 +103,7 @@ class Tree(object):
             while len(printed_parents) == 1:
                 key = printed_parents[0]
                 templist = sorted(self.nodes[key].children)
+                templist.sort(key=lambda x: self.nodes[x].status == 'file')
                 flag = False
                 for filename in templist:
                     if self.nodes[filename].status == 'file':

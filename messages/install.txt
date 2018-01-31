@@ -1,0 +1,5 @@
+Thank you for installing OpenedFiles - plugin to show opened files as a treeview or a listview
+
+For more information please read:
+
+https://github.com/qiray/SublimeOpenedFiles

@@ -7,12 +7,11 @@ import sublime_plugin
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 9
-VERSION_PATCH = 4
+VERSION_PATCH = 5
 
 ST3 = int(sublime.version()) >= 3000
 
 #TODO: add comments
-#TODO: write README file
 
 if ST3:
     from .common import untitled_name, debug, SYNTAX_EXTENSION

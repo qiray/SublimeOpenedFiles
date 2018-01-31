@@ -1,0 +1,7 @@
+0.9.5
+
+README file changed (added PackageControl URL in installation paragraph).
+
+Added settings menu.
+
+Fixed sort for files and dirs. Now folders are always ahead of files in treeview.
