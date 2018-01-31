@@ -28,7 +28,19 @@ Or by cloning this repo into your SublimeText Packages directory and rename it t
 
 ## Commands and Keybindings
 
-This plugin add <kbd>ctrl+F1</kbd> keybinding for opening a new tab with `Opened files` but you can change it to your binding.
+This plugin add <kbd>ctrl+F1</kbd> keybinding for opening a new tab with `Opened files` but you can change it to your binding:
+
+Format is:
+
+``` json
+    {
+		"keys": ["ctrl+f1"],
+		"command": "opened_files",
+		"args": {
+			"focus": true,
+		}
+	}
+```
 
 It also has some key shortcuts for using in `Opened files` tab:
 
