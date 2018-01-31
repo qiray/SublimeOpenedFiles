@@ -33,7 +33,7 @@ This plugin add <kbd>ctrl+F1</kbd> keybinding for opening a new tab with `Opened
 Format is:
 
 ``` json
-    {
+	{
 		"keys": ["ctrl+f1"],
 		"command": "opened_files",
 		"args": {
