@@ -10,9 +10,10 @@ if ST3:
 else:
     SYNTAX_EXTENSION = '.hidden-tmLanguage'
 
-debug_level = 1
-untitled_name = 'untitled' #const
+DEBUG_LEVEL = 1
+UNTITLED_NAME = 'untitled' #const
 
 def debug(level, *args):
-    if level <= debug_level:
+    """Log debug info according to debug level"""
+    if level <= DEBUG_LEVEL:
         print('[DEBUG]', level, args)

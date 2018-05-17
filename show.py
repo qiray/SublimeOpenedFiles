@@ -19,13 +19,11 @@ def first(seq, pred):
     return next((item for item in seq if pred(item)), None)
 
 def set_proper_scheme(view):
+    '''set color scheme'''
     settings = sublime.load_settings('opened_files.sublime-settings')
     if view.settings().get('color_scheme') == settings.get('color_scheme'):
         return
     view.settings().set('color_scheme', settings.get('color_scheme'))
-
-def calc_width(view):
-    return 0.2 #default value
 
 def get_group(groups, nag):
     '''
@@ -42,12 +40,13 @@ def get_group(groups, nag):
     return group
 
 def set_active_group(window, view, other_group, view_exist):
+    """Function from SublimeFileBrowser with some modifications"""
     nag = window.active_group()
     if other_group:
         group = 0 if other_group == 'left' else 1
         groups = window.num_groups()
         if groups == 1:
-            width = calc_width(view)
+            width = 0.2 #default value
             cols = [0.0, width, 1.0] if other_group == 'left' else [0.0, 1 - width, 1.0]
             window.set_layout({"cols": cols, "rows": [0.0, 1.0], "cells": [[0, 0, 1, 1], [1, 0, 2, 1]]})
         elif view:
@@ -57,15 +56,14 @@ def set_active_group(window, view, other_group, view_exist):
     else:
         group = nag
 
-    # when other_group is left, we need move all views to right except FB view
+    # when other_group is left, we need move all views to right except our view
     if nag == 0 and other_group == 'left' and group == 0:
         for v in reversed(window.views_in_group(nag)[1:]):
             window.set_view_index(v, 1, 0)
 
-    return (nag, group)
-
 
 def set_view(view_id, window):
+    """select or create view for plugin"""
     view = None
     if view_id:
         view = first(window.views(), lambda v: v.id() == view_id)
@@ -96,7 +94,7 @@ def show(window, path, view_id=None, ignore_existing=False, single_pane=False, o
 
     view = set_view(view_id, window)
 
-    nag, group = set_active_group(window, view, other_group, view_exist)
+    set_active_group(window, view, other_group, view_exist)
 
     if other_group and prev_focus:
         window.focus_view(prev_focus)

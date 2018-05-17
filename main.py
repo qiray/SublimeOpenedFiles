@@ -14,18 +14,18 @@ ST3 = int(sublime.version()) >= 3000
 #TODO: add comments
 
 if ST3:
-    from .common import untitled_name, debug, SYNTAX_EXTENSION
+    from .common import UNTITLED_NAME, debug, SYNTAX_EXTENSION
     from .show import show, first
     from .treeview import Tree
     from .listview import List
 else:  # ST2 imports
-    from common import untitled_name, debug, SYNTAX_EXTENSION
+    from common import UNTITLED_NAME, debug, SYNTAX_EXTENSION
     from show import show, first
     from treeview import Tree
     from listview import List
 
 def view_name(view):
-    result = untitled_name
+    result = UNTITLED_NAME
     filename = view.file_name()
     name = view.name()
     if filename is not None and filename != '':
@@ -106,7 +106,7 @@ class OpenedFilesActCommand(sublime_plugin.TextCommand):
 
     def open_file(self, edit, selection, act):
         window = self.view.window()
-        (row, col) = self.view.rowcol(selection.begin())
+        (row, ) = self.view.rowcol(selection.begin())
 
         plugin_settings = sublime.load_settings('opened_files.sublime-settings')
         if not plugin_settings.get('tree_view'): #list view
@@ -143,7 +143,7 @@ class OpenedFilesActCommand(sublime_plugin.TextCommand):
 class OpenedFilesOpenExternalCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         selection = self.view.sel()[0]
-        (row, col) = self.view.rowcol(selection.begin())
+        (row, ) = self.view.rowcol(selection.begin())
         action = OpenedFilesCommand.tree.get_action(row)
         if action is None:
             return
