@@ -77,7 +77,7 @@ def set_view(view_id, window):
     return view
 
 
-def show(window, path, view_id=None, ignore_existing=False, single_pane=False, other_group=False, focus=False):
+def show(window, path, view_id=None, other_window=False, single_pane=False, other_group=False, focus=False):
     """
     Determines the correct view to use, creating one if necessary, and prepares it.
     """
@@ -113,8 +113,9 @@ def show(window, path, view_id=None, ignore_existing=False, single_pane=False, o
     view.settings().set('opened_files_type', True)
 
     # forcibly shoot on_activated, because when view was created it didnot have any settings
-    window.show_quick_panel(['a', 'b'], None)
-    window.run_command('hide_overlay')
-    if view_id is None or focus:
+    if not other_window:
+        window.show_quick_panel(['a', 'b'], None)
+        window.run_command('hide_overlay')
+    if not other_window and (view_id is None or focus):
         window.focus_view(view)
     return view

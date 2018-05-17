@@ -25,6 +25,7 @@ else:  # ST2 imports
     from listview import List
 
 def view_name(view):
+    """Function to get view name"""
     result = UNTITLED_NAME
     filename = view.file_name()
     name = view.name()
@@ -55,12 +56,12 @@ def generate_list(view_list):
         result.add_filename(name, view.id(), is_file=False if view.file_name() is None else True)
     return result
 
-def draw_view(window, edit, view_object, focus=False):
+def draw_view(window, edit, view_object, focus=False, other_window=False):
     plugin_settings = sublime.load_settings('opened_files.sublime-settings')
     group_position = plugin_settings.get('group_position')
     if group_position != 'left' and group_position != 'right':
         group_position = 'left'
-    view = show(window, 'Opened Files', view_id=OpenedFilesCommand.OPENED_FILES_VIEW, other_group=group_position,focus=focus)
+    view = show(window, 'Opened Files', other_window=other_window, view_id=OpenedFilesCommand.OPENED_FILES_VIEW, other_group=group_position,focus=focus)
     if not view:
         OpenedFilesCommand.OPENED_FILES_VIEW = None
         return
@@ -76,28 +77,31 @@ class OpenedFilesCommand(sublime_plugin.TextCommand): #view.run_command('opened_
     tree = Tree()
     files_list = List()
 
-    def run(self, edit, focus=False):
+    def run(self, edit, focus=False, other_window=False):
         window = self.view.window()
-        view_list = window.views()
-
-        temp = []
-        for view in view_list:
-            settings = view.settings()
-            if settings.get("opened_files_type"):
-                OpenedFilesCommand.OPENED_FILES_VIEW = view.id()
-            elif settings.get('dired_path'):
-                pass
-            else:
-                temp.append(view)
-        view_list = temp
+        #if we already have OpenedFiles window we shouldn't create anymore
+        if OpenedFilesListener.current_window is not None and \
+            OpenedFilesListener.current_window != window:
+            return
+        windows = sublime.windows()
+        view_list = []
+        for win in windows:
+            for view in win.views():
+                settings = view.settings()
+                if settings.get("opened_files_type"):
+                    OpenedFilesCommand.OPENED_FILES_VIEW = view.id()
+                elif settings.get('dired_path'):
+                    pass
+                else:
+                    view_list.append(view)
 
         plugin_settings = sublime.load_settings('opened_files.sublime-settings')
         if plugin_settings.get('tree_view'): #treeview
             OpenedFilesCommand.tree = generate_tree(view_list, OpenedFilesCommand.tree)
-            draw_view(window, edit, OpenedFilesCommand.tree, focus)
+            draw_view(window, edit, OpenedFilesCommand.tree, focus, other_window)
         else: #listview
             OpenedFilesCommand.files_list = generate_list(view_list)
-            draw_view(window, edit, OpenedFilesCommand.files_list, focus)
+            draw_view(window, edit, OpenedFilesCommand.files_list, focus, other_window)
 
 class OpenedFilesActCommand(sublime_plugin.TextCommand):
     def run(self, edit, act='default'):
@@ -106,7 +110,7 @@ class OpenedFilesActCommand(sublime_plugin.TextCommand):
 
     def open_file(self, edit, selection, act):
         window = self.view.window()
-        (row, ) = self.view.rowcol(selection.begin())
+        (row, col) = self.view.rowcol(selection.begin())
 
         plugin_settings = sublime.load_settings('opened_files.sublime-settings')
         if not plugin_settings.get('tree_view'): #list view
@@ -143,7 +147,7 @@ class OpenedFilesActCommand(sublime_plugin.TextCommand):
 class OpenedFilesOpenExternalCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         selection = self.view.sel()[0]
-        (row, ) = self.view.rowcol(selection.begin())
+        (row, col) = self.view.rowcol(selection.begin())
         action = OpenedFilesCommand.tree.get_action(row)
         if action is None:
             return
@@ -181,7 +185,7 @@ else:
 # Event listners
 
 def get_opened_files_view():
-    windows = sublime.windows()#[0].views()
+    windows = sublime.windows()
     for win in windows:
         views = win.views()
         if OpenedFilesCommand.OPENED_FILES_VIEW is not None:
@@ -192,10 +196,10 @@ def get_opened_files_view():
             return view
     return None
 
-def update_opened_files_view():
+def update_opened_files_view(other_window=False):
     view = get_opened_files_view()
     if view:
-        view.run_command('opened_files')
+        view.run_command('opened_files', {"other_window": other_window})
 
 def is_transient_view(window, view): # from https://github.com/FichteFoll/FileHistory (MIT license)
     if not ST3:
@@ -227,12 +231,14 @@ class OpenedFilesListener(sublime_plugin.EventListener):
     def on_close(self, view):
         w = sublime.active_window()
         if w != OpenedFilesListener.current_window or is_transient_view(w, view) and not view.id() in OpenedFilesListener.active_list:
+            update_opened_files_view(True)
             return
         if view.id() in OpenedFilesListener.active_list:
             OpenedFilesListener.active_list[view.id()] = False
         if not 'opened_files' in view.scope_name(0):
             update_opened_files_view()
             return
+        OpenedFilesListener.current_window = None #reset current window
         # check if closed view was a single one in group
         if ST3:
             single = not w.views_in_group(0) or not w.views_in_group(1)
@@ -247,6 +253,7 @@ class OpenedFilesListener(sublime_plugin.EventListener):
         opened_view = get_opened_files_view()
         w = sublime.active_window()
         if w != OpenedFilesListener.current_window or not opened_view or is_transient_view(w, view):
+            update_opened_files_view(True)
             return
         active_view = w.active_view()
         num_groups = w.num_groups()
@@ -262,18 +269,21 @@ class OpenedFilesListener(sublime_plugin.EventListener):
     def on_load(self, view):
         w = sublime.active_window()
         if w != OpenedFilesListener.current_window:
+            update_opened_files_view(True)
             return
         self.on_new(view)
 
     def on_clone(self, view):
         w = sublime.active_window()
         if w != OpenedFilesListener.current_window:
+            update_opened_files_view(True)
             return
         self.on_new(view)
 
     def on_post_save_async(self, view):
         w = sublime.active_window()
         if w != OpenedFilesListener.current_window:
+            update_opened_files_view(True)
             return
         self.on_new(view)
 
