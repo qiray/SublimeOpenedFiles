@@ -18,11 +18,13 @@ if ST3:
     from .show import show, first
     from .treeview import Tree
     from .listview import List
+    from .GotoWindow import focus_window
 else:  # ST2 imports
     from common import UNTITLED_NAME, debug, SYNTAX_EXTENSION
     from show import show, first
     from treeview import Tree
     from listview import List
+    from GotoWindow import focus_window
 
 def view_name(view):
     """Function to get view name"""
@@ -126,8 +128,12 @@ class OpenedFilesActCommand(sublime_plugin.TextCommand):
         node = OpenedFilesCommand.tree.nodes[action['id']]
         goto_linenumber = row + 1
         if action['action'] == 'file' and act == 'default':
-            view = first(window.views(), lambda v: v.id() == action['view_id'])
-            window.focus_view(view)
+            for win in sublime.windows():
+                view = first(win.views(), lambda v: v.id() == action['view_id'])
+                if view:
+                    focus_window(win, view)
+                    # win.focus_view(view)
+                    break
         elif action['action'] == 'fold' and act != 'unfold':
             OpenedFilesCommand.tree.nodes[action['id']].status = 'unfold'
             draw_view(window, edit, OpenedFilesCommand.tree)
