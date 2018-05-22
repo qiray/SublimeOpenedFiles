@@ -10,15 +10,15 @@ ST3 = int(sublime.version()) >= 3000
 class Node(object):
     separator = '  '
 
-    def __init__(self, node_id, children, status, parent=None, view_id=None):
+    def __init__(self, node_id, children, status, parent=None, view_id=None, win_id=0):
         self.node_id = node_id
         self.parent = parent
         self.children = children
         self.status = status
         self.view_id = view_id
         self.stringnum = ''
-        self.max_parents = []
         self.printed = False
+        self.win_id = win_id
 
     def add_child(self, child):
         if not child in self.children:
@@ -56,6 +56,14 @@ class Tree(object):
         self.parents = {}
         self.opened_views = {}
         self.actions_map = ActionsMap()
+        plugin_settings = sublime.load_settings('opened_files.sublime-settings')
+        self.tree_view = plugin_settings.get('tree_view')
+        self.windows = {}
+        windows = sublime.windows()
+        count = 0
+        for win in windows:
+            count += 1
+            self.windows[win.id()] = "Window {}".format(count)
 
     def get_nodes(self):
         return self.nodes
@@ -68,14 +76,16 @@ class Tree(object):
     def set_node(self, node_id, node):
         self.nodes[node_id] = node
 
-    def add_filename(self, filename, view_id, is_file):
+    def add_filename(self, filename, view_id, is_file, window):
+        win_id = window.id()
+        filename = self.windows[window.id()] + os.sep + filename
         arr = filename.split(os.sep)
         length = len(arr)
         if not is_file:
-            newname = '{} (id = {})'.format(filename, view_id)
-            node = Node(newname, {}, 'file', None, view_id)
-            self.nodes[newname] = node
-            self.opened_views[newname] = node
+            filename = '{} (id = {})'.format(filename, view_id)
+            node = Node(filename, {}, 'file', None, view_id, win_id=win_id)
+            self.nodes[filename] = node
+            self.opened_views[filename] = node
             return
         if not arr[0] in self.parents:
             self.parents[arr[0]] = True
@@ -86,9 +96,9 @@ class Tree(object):
                 if name in self.nodes:
                     self.nodes[name].add_child(child)
                 else:
-                    self.nodes[name] = Node(name, {child : True}, 'fold', os.sep.join(arr[:i - 1]))
+                    self.nodes[name] = Node(name, {child : True}, 'fold', os.sep.join(arr[:i - 1]), win_id=win_id)
             else:
-                self.nodes[name] = Node(name, {}, 'file', os.sep.join(arr[:i - 1]), view_id)
+                self.nodes[name] = Node(name, {}, 'file', os.sep.join(arr[:i - 1]), view_id, win_id=win_id)
 
     def __str__(self):
         result = ''
@@ -130,11 +140,23 @@ class Tree(object):
             templist.sort(key=lambda x: x.split(os.sep)[-1].lower())
             printed_parents = templist
         for name in printed_parents:
-            temp, stringnum = self.nodes[name].print_children(self.nodes, self.actions_map, 0, stringnum)
+            win_id = self.nodes[name].win_id
+            window = self.windows[win_id]
+            length = 0
+            if name != window: #draw window
+                node = self.nodes[window]
+                result += node.get_name() + '\n'
+                stringnum += 1
+                self.actions_map.add_action(node)
+                length = 1
+                if node.status == 'unfold':
+                    continue
+            temp, stringnum = self.nodes[name].print_children(self.nodes, self.actions_map, length, stringnum)
             result += temp
-        for name in self.opened_views:
-            temp, stringnum = self.opened_views[name].print_children(self.opened_views, self.actions_map, 0, stringnum)
-            result += temp
+            for name in self.opened_views: #draw non-files views
+                if self.nodes[name].win_id == win_id:
+                    temp, stringnum = self.opened_views[name].print_children(self.opened_views, self.actions_map, 1, stringnum)
+                    result += temp
         return result
 
     def get_action(self, number):

@@ -1,32 +1,31 @@
 {
-  /*
-  If true then show treeview else show listview.
-  */
-  "tree_view": true,
+    /*
+    If true then show treeview else show listview.
+    */
+    "tree_view": true,
 
-  /*
-  Values for tree view:
-  full - always show full path,
-  medium - show folders with the same level on the same indents,
-  default - don't show folders with only one child folder.
-  */
-  "tree_size": "default",
+    /*
+    Values for tree view:
+    full - always show full path,
+    default - don't show folders with only one child folder.
+    */
+    "tree_size": "default",
 
-  /*
-  Select group to show (left or right)
-  */
-  "group_position": "left",
-  
-  "color_scheme": "Packages/OpenedFiles/opened_files.hidden-tmTheme",
-  "line_numbers": false,
-  "word_wrap": false,
-  "spell_check": false,
-  "scroll_past_end": false,
-  "draw_indent_guides": false,
-  "fold_buttons": false,
-  "drag_text": false,
-  "highlight_line": true,
-  "margin": 0,
-  "tab_size": 2,
-  "rulers": [],
+    /*
+    Select group to show (left or right)
+    */
+    "group_position": "left",
+
+    "color_scheme": "Packages/OpenedFiles/opened_files.hidden-tmTheme",
+    "line_numbers": false,
+    "word_wrap": false,
+    "spell_check": false,
+    "scroll_past_end": false,
+    "draw_indent_guides": false,
+    "fold_buttons": false,
+    "drag_text": false,
+    "highlight_line": true,
+    "margin": 0,
+    "tab_size": 2,
+    "rulers": [],
 }

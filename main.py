@@ -41,7 +41,7 @@ def generate_tree(view_list, localtree):
     result = Tree()
     for view in view_list:
         name = view_name(view)
-        result.add_filename(name, view.id(), is_file=False if view.file_name() is None else True)
+        result.add_filename(name, view.id(), is_file=False if view.file_name() is None else True, window=view.window())
     nodes = result.get_nodes()
     for n in nodes:
         old_node = localtree.get_node(n)
@@ -55,7 +55,7 @@ def generate_list(view_list):
     result = List()
     for view in view_list:
         name = view_name(view)
-        result.add_filename(name, view.id(), is_file=False if view.file_name() is None else True)
+        result.add_filename(name, view.id(), is_file=False if view.file_name() is None else True, window=view.window())
     return result
 
 def draw_view(window, edit, view_object, focus=False, other_window=False):
