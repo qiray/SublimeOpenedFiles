@@ -51,11 +51,14 @@ class Node(object):
 class Tree(object):
     tree_size = 0
 
-    def __init__(self):
+    def __init__(self, name = ""):
+        self.name = name
+        self.hidden = False
         self.nodes = {}
         self.parents = {}
         self.opened_views = {}
         self.actions_map = ActionsMap()
+        self.size = 0
 
     def get_nodes(self):
         return self.nodes
@@ -92,6 +95,10 @@ class Tree(object):
 
     def __str__(self):
         result = ''
+        if self.hidden:
+            result = '▸ ' +  self.name
+        else:
+            result = '▾ ' +  self.name
         self.actions_map.clear()
         printed_parents = sorted(self.parents) #dict here becomes list!
         printed_parents.sort(key=lambda x: self.nodes[x].status == 'file')
@@ -129,12 +136,14 @@ class Tree(object):
                     templist.append(tempname)
             templist.sort(key=lambda x: x.split(os.sep)[-1].lower())
             printed_parents = templist
+        length = 0 if self.name == '' else 1
         for name in printed_parents:
-            temp, stringnum = self.nodes[name].print_children(self.nodes, self.actions_map, 0, stringnum)
+            temp, stringnum = self.nodes[name].print_children(self.nodes, self.actions_map, length, stringnum)
             result += temp
         for name in self.opened_views:
-            temp, stringnum = self.opened_views[name].print_children(self.opened_views, self.actions_map, 0, stringnum)
+            temp, stringnum = self.opened_views[name].print_children(self.opened_views, self.actions_map, length, stringnum)
             result += temp
+        self.size = stringnum
         return result
 
     def get_action(self, number):
@@ -147,10 +156,12 @@ class ActionsMap(object):
         self.count = 0
 
     def add_action(self, node):
-        self.map[self.count] = {'action' : node.status, 'id' : node.node_id, 'view_id' : node.view_id}
         self.count += 1
+        self.map[self.count] = {'action' : node.status, 'id' : node.node_id, 'view_id' : node.view_id}
 
     def get_action(self, number):
+        for k in self.map:
+            print (k)
         if number in self.map:
             return self.map[number]
         return None

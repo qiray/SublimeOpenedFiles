@@ -63,7 +63,6 @@ def _osx_focus():
 def _linux_focus(window, view):
     project = get_project(view)
     window_title = get_official_title(view, project)
-    print (window_title)
     try:
         Popen(["wmctrl", "-a", window_title],
                 stdout=PIPE, stderr=PIPE)
@@ -82,11 +81,8 @@ def get_official_title(view, project):
     Note: The full file path isn't computed,
     because ST uses `~` to shorten the path.
     """
-    print(1, 2)
     view_name = view.name() or view.file_name() or "untitled"
-    print (view_name)
     official_title = os.path.basename(view_name)
-    print (official_title)
     if view.is_dirty():
         official_title += " •"
     if project:

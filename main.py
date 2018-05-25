@@ -1,6 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-# This project uses some code and ideas from Sublime FileBrowser plugin with MIT license - https://packagecontrol.io/packages/FileBrowser
+#*- coding: utf-8 -*-
+"""
+This project uses some code and ideas from Sublime FileBrowser plugin
+with MIT license - https://packagecontrol.io/packages/FileBrowser
+"""
 
 import sublime
 import sublime_plugin
@@ -37,18 +40,27 @@ def view_name(view):
         result = name
     return result
 
-def generate_tree(view_list, localtree):
-    result = Tree()
-    for view in view_list:
-        name = view_name(view)
-        result.add_filename(name, view.id(), is_file=False if view.file_name() is None else True)
-    nodes = result.get_nodes()
-    for n in nodes:
-        old_node = localtree.get_node(n)
-        new_node = result.get_node(n)
-        if old_node:
-            new_node.status = old_node.status
-            result.set_node(n, new_node)
+def generate_trees(view_list, localtrees):
+    result = []
+    count = 1
+    for l in view_list:
+        temp_tree = Tree("Window {}\n".format(count))
+        for view in l:
+            name = view_name(view)
+            temp_tree.add_filename(name, view.id(), is_file=False if view.file_name() is None else True)
+        nodes = temp_tree.get_nodes()
+        for n in nodes:
+            old_node = None
+            for tree in localtrees:
+                old_node = tree.get_node(n)
+                if old_node:
+                    break
+            new_node = temp_tree.get_node(n)
+            if old_node:
+                new_node.status = old_node.status
+                temp_tree.set_node(n, new_node)
+        result.append(temp_tree)
+        count += 1
     return result
 
 def generate_list(view_list):
@@ -70,13 +82,19 @@ def draw_view(window, edit, view_object, focus=False, other_window=False):
     OpenedFilesCommand.OPENED_FILES_VIEW = view.id()
     view.set_read_only(False) #Enable edit for pasting result
     view.erase(edit, sublime.Region(0, view.size())) #clear view content
-    view.insert(edit, 0, str(view_object)) #paste result
+    if isinstance(view_object, list):
+        result = ''
+        for elm in view_object:
+            result += str(elm)
+        view.insert(edit, 0, result)
+    else:
+        view.insert(edit, 0, str(view_object)) #paste result
     view.set_read_only(True) #Disable edit
 
 class OpenedFilesCommand(sublime_plugin.TextCommand): #view.run_command('opened_files')
 
     OPENED_FILES_VIEW = None
-    tree = Tree()
+    trees = []
     files_list = List()
 
     def run(self, edit, focus=False, other_window=False):
@@ -87,7 +105,9 @@ class OpenedFilesCommand(sublime_plugin.TextCommand): #view.run_command('opened_
             return
         windows = sublime.windows()
         view_list = []
+        count = 0
         for win in windows:
+            view_list.append([])
             for view in win.views():
                 settings = view.settings()
                 if settings.get("opened_files_type"):
@@ -95,12 +115,12 @@ class OpenedFilesCommand(sublime_plugin.TextCommand): #view.run_command('opened_
                 elif settings.get('dired_path'):
                     pass
                 else:
-                    view_list.append(view)
-
+                    view_list[count].append(view)
+            count += 1
         plugin_settings = sublime.load_settings('opened_files.sublime-settings')
         if plugin_settings.get('tree_view'): #treeview
-            OpenedFilesCommand.tree = generate_tree(view_list, OpenedFilesCommand.tree)
-            draw_view(window, edit, OpenedFilesCommand.tree, focus, other_window)
+            OpenedFilesCommand.trees = generate_trees(view_list, OpenedFilesCommand.trees)
+            draw_view(window, edit, OpenedFilesCommand.trees, focus, other_window)
         else: #listview
             OpenedFilesCommand.files_list = generate_list(view_list)
             draw_view(window, edit, OpenedFilesCommand.files_list, focus, other_window)
@@ -112,7 +132,7 @@ class OpenedFilesActCommand(sublime_plugin.TextCommand):
 
     def open_file(self, edit, selection, act):
         window = self.view.window()
-        (row, col) = self.view.rowcol(selection.begin())
+        (row, _) = self.view.rowcol(selection.begin())
 
         plugin_settings = sublime.load_settings('opened_files.sublime-settings')
         if not plugin_settings.get('tree_view'): #list view
@@ -122,30 +142,38 @@ class OpenedFilesActCommand(sublime_plugin.TextCommand):
             goto_linenumber = row + 1
             return
 
-        action = OpenedFilesCommand.tree.get_action(row)
+        curtree = 0
+        length, prevlength = 0, 0
+        for tree in OpenedFilesCommand.trees: #calc used tree
+            if length > row:
+                break
+            prevlength = length
+            length += tree.size
+            curtree += 1
+        curtree -= 1
+        action = OpenedFilesCommand.trees[curtree].get_action(row - prevlength)
         if action is None:
             return
-        node = OpenedFilesCommand.tree.nodes[action['id']]
+        node = OpenedFilesCommand.trees[curtree].nodes[action['id']]
         goto_linenumber = row + 1
         if action['action'] == 'file' and act == 'default':
             for win in sublime.windows():
                 view = first(win.views(), lambda v: v.id() == action['view_id'])
                 if view:
                     focus_window(win, view)
-                    # win.focus_view(view)
                     break
         elif action['action'] == 'fold' and act != 'unfold':
-            OpenedFilesCommand.tree.nodes[action['id']].status = 'unfold'
-            draw_view(window, edit, OpenedFilesCommand.tree)
+            OpenedFilesCommand.trees[curtree].nodes[action['id']].status = 'unfold'
+            draw_view(window, edit, OpenedFilesCommand.trees)
         elif action['action'] == 'unfold' and act != 'fold':
-            OpenedFilesCommand.tree.nodes[action['id']].status = 'fold'
-            draw_view(window, edit, OpenedFilesCommand.tree)
+            OpenedFilesCommand.trees[curtree].nodes[action['id']].status = 'fold'
+            draw_view(window, edit, OpenedFilesCommand.trees)
         elif act == 'fold' and node.parent is not None and node.parent != '':
-            goto_linenumber = OpenedFilesCommand.tree.nodes[node.parent].stringnum
-            OpenedFilesCommand.tree.nodes[node.parent].status = 'unfold'
-            draw_view(window, edit, OpenedFilesCommand.tree)
+            goto_linenumber = OpenedFilesCommand.trees[curtree].nodes[node.parent].stringnum
+            OpenedFilesCommand.trees[curtree].nodes[node.parent].status = 'unfold'
+            draw_view(window, edit, OpenedFilesCommand.trees)
         elif act == 'unfold' and node.children:
-            goto_linenumber = OpenedFilesCommand.tree.nodes[sorted(node.children)[0]].stringnum
+            goto_linenumber = OpenedFilesCommand.trees[curtree].nodes[sorted(node.children)[0]].stringnum
         if goto_linenumber == '':
             goto_linenumber = row + 1
         self.view.run_command("goto_line", {"line": goto_linenumber})
