@@ -44,6 +44,8 @@ def generate_trees(view_list, localtrees):
     result = []
     count = 1
     for l in view_list:
+        if (len(l) == 0):
+            continue
         temp_tree = Tree("Window {}\n".format(count))
         for view in l:
             name = view_name(view)

@@ -160,8 +160,6 @@ class ActionsMap(object):
         self.map[self.count] = {'action' : node.status, 'id' : node.node_id, 'view_id' : node.view_id}
 
     def get_action(self, number):
-        for k in self.map:
-            print (k)
         if number in self.map:
             return self.map[number]
         return None
