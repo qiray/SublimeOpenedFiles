@@ -20,13 +20,11 @@ if ST3:
     from .common import UNTITLED_NAME, debug, SYNTAX_EXTENSION
     from .show import show, first
     from .treeview import Tree
-    from .listview import List
     from .GotoWindow import focus_window
 else:  # ST2 imports
     from common import UNTITLED_NAME, debug, SYNTAX_EXTENSION
     from show import show, first
     from treeview import Tree
-    from listview import List
     from GotoWindow import focus_window
 
 def view_name(view):
@@ -65,13 +63,6 @@ def generate_trees(view_list, localtrees):
         count += 1
     return result
 
-def generate_list(view_list):
-    result = List()
-    for view in view_list:
-        name = view_name(view)
-        result.add_filename(name, view.id(), is_file=False if view.file_name() is None else True)
-    return result
-
 def draw_view(window, edit, view_object, focus=False, other_window=False):
     plugin_settings = sublime.load_settings('opened_files.sublime-settings')
     group_position = plugin_settings.get('group_position')
@@ -97,7 +88,6 @@ class OpenedFilesCommand(sublime_plugin.TextCommand): #view.run_command('opened_
 
     OPENED_FILES_VIEW = None
     trees = []
-    files_list = List()
 
     def run(self, edit, focus=False, other_window=False):
         window = self.view.window()
@@ -119,13 +109,8 @@ class OpenedFilesCommand(sublime_plugin.TextCommand): #view.run_command('opened_
                 else:
                     view_list[count].append(view)
             count += 1
-        plugin_settings = sublime.load_settings('opened_files.sublime-settings')
-        if plugin_settings.get('tree_view'): #treeview
-            OpenedFilesCommand.trees = generate_trees(view_list, OpenedFilesCommand.trees)
-            draw_view(window, edit, OpenedFilesCommand.trees, focus, other_window)
-        else: #listview
-            OpenedFilesCommand.files_list = generate_list(view_list)
-            draw_view(window, edit, OpenedFilesCommand.files_list, focus, other_window)
+        OpenedFilesCommand.trees = generate_trees(view_list, OpenedFilesCommand.trees)
+        draw_view(window, edit, OpenedFilesCommand.trees, focus, other_window)
 
 class OpenedFilesActCommand(sublime_plugin.TextCommand):
     def run(self, edit, act='default'):
@@ -135,15 +120,6 @@ class OpenedFilesActCommand(sublime_plugin.TextCommand):
     def open_file(self, edit, selection, act):
         window = self.view.window()
         (row, _) = self.view.rowcol(selection.begin())
-
-        plugin_settings = sublime.load_settings('opened_files.sublime-settings')
-        if not plugin_settings.get('tree_view'): #list view
-            view_id = OpenedFilesCommand.files_list.get_view_id(row + 1)
-            view = first(window.views(), lambda v: v.id() == view_id)
-            window.focus_view(view)
-            goto_linenumber = row + 1
-            return
-
         curtree = 0
         length, prevlength = 0, 0
         for tree in OpenedFilesCommand.trees: #calc used tree
@@ -156,7 +132,8 @@ class OpenedFilesActCommand(sublime_plugin.TextCommand):
         action = OpenedFilesCommand.trees[curtree].get_action(row - prevlength)
         if action is None:
             return
-        node = OpenedFilesCommand.trees[curtree].nodes[action['id']]
+        if 'id' in action:
+            node = OpenedFilesCommand.trees[curtree].nodes[action['id']]
         goto_linenumber = row + 1
         if action['action'] == 'file' and act == 'default':
             for win in sublime.windows():
@@ -164,6 +141,9 @@ class OpenedFilesActCommand(sublime_plugin.TextCommand):
                 if view:
                     focus_window(win, view)
                     break
+        elif action['action'] == 'window':
+            OpenedFilesCommand.trees[curtree].hidden = not OpenedFilesCommand.trees[curtree].hidden
+            draw_view(window, edit, OpenedFilesCommand.trees)
         elif action['action'] == 'fold' and act != 'unfold':
             OpenedFilesCommand.trees[curtree].nodes[action['id']].status = 'unfold'
             draw_view(window, edit, OpenedFilesCommand.trees)

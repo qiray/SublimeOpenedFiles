@@ -50,10 +50,11 @@ class Node(object):
 
 class Tree(object):
     tree_size = 0
+    tree_view = False
 
     def __init__(self, name = ""):
         self.name = name
-        self.hidden = False
+        self.hidden = False #if True then hide this window's tree
         self.nodes = {}
         self.parents = {}
         self.opened_views = {}
@@ -93,49 +94,62 @@ class Tree(object):
             else:
                 self.nodes[name] = Node(name, {}, 'file', os.sep.join(arr[:i - 1]), view_id)
 
-    def __str__(self):
-        result = ''
-        if self.hidden:
-            result = '▸ ' +  self.name
-        else:
-            result = '▾ ' +  self.name
-        self.actions_map.clear()
+    def draw_list(self, result):
+        stringnum = 1
+        length = 0 if self.name == '' else 1
+        nodes = sorted(self.nodes)
+        nodes.sort(key=lambda x: x.split(os.sep)[-1]) #sort by short filenames
+        for name in nodes:
+            node = self.nodes[name]
+            if node.view_id:
+                temp, stringnum = node.print_children(self.nodes, self.actions_map, length, stringnum)
+                result += temp
+            self.size = stringnum
+        return result
+
+    def prepare_default_tree(self, printed_parents):
+        result = []
+        for name in printed_parents:
+            tempname = name
+            flag = True
+            while len(self.nodes[tempname].children) == 1:
+                tempname = sorted(self.nodes[tempname].children)[0]
+                if self.nodes[tempname].status == 'file':
+                    tempname = self.nodes[tempname].parent
+                    result.append(tempname)
+                    flag = False
+                    break
+            if flag:
+                result.append(tempname)
+        result.sort(key=lambda x: x.split(os.sep)[-1].lower())
+        return result
+
+    def prepare_notfull_tree(self, printed_parents):
+        result = []
+        while len(printed_parents) == 1:
+            key = printed_parents[0]
+            result = sorted(self.nodes[key].children)
+            result.sort(key=lambda x: self.nodes[x].status == 'file')
+            flag = False
+            for filename in result:
+                if self.nodes[filename].status == 'file':
+                    flag = True
+                    break
+            if flag:
+                break
+            printed_parents = result
+        return printed_parents    
+
+    def draw_tree(self, result):
         printed_parents = sorted(self.parents) #dict here becomes list!
         printed_parents.sort(key=lambda x: self.nodes[x].status == 'file')
-        plugin_settings = sublime.load_settings('opened_files.sublime-settings')
-        Tree.tree_size = plugin_settings.get('tree_size')
         if Tree.tree_size != 'default' and Tree.tree_size != 'full' and Tree.tree_size != 'medium':
             Tree.tree_size = 'default'
         if Tree.tree_size != 'full':
-            while len(printed_parents) == 1:
-                key = printed_parents[0]
-                templist = sorted(self.nodes[key].children)
-                templist.sort(key=lambda x: self.nodes[x].status == 'file')
-                flag = False
-                for filename in templist:
-                    if self.nodes[filename].status == 'file':
-                        flag = True
-                        break
-                if flag:
-                    break
-                printed_parents = templist
-        stringnum = 1
+            printed_parents = self.prepare_notfull_tree(printed_parents)
         if Tree.tree_size == 'default':
-            templist = []
-            for name in printed_parents:
-                tempname = name
-                flag = True
-                while len(self.nodes[tempname].children) == 1:
-                    tempname = sorted(self.nodes[tempname].children)[0]
-                    if self.nodes[tempname].status == 'file':
-                        tempname = self.nodes[tempname].parent
-                        templist.append(tempname)
-                        flag = False
-                        break
-                if flag:
-                    templist.append(tempname)
-            templist.sort(key=lambda x: x.split(os.sep)[-1].lower())
-            printed_parents = templist
+            printed_parents = self.prepare_default_tree(printed_parents)
+        stringnum = 1
         length = 0 if self.name == '' else 1
         for name in printed_parents:
             temp, stringnum = self.nodes[name].print_children(self.nodes, self.actions_map, length, stringnum)
@@ -146,6 +160,19 @@ class Tree(object):
         self.size = stringnum
         return result
 
+    def __str__(self):
+        self.actions_map.clear()
+        self.actions_map.set_window_action()
+        if self.hidden:
+            return '▸ ' +  self.name
+        result = '▾ ' +  self.name
+        plugin_settings = sublime.load_settings('opened_files.sublime-settings')
+        Tree.tree_size = plugin_settings.get('tree_size')
+        Tree.tree_view = plugin_settings.get('tree_view')
+        if not Tree.tree_view:
+            return self.draw_list(result)
+        return self.draw_tree(result)
+
     def get_action(self, number):
         return self.actions_map.get_action(number)
 
@@ -154,6 +181,9 @@ class ActionsMap(object):
     def __init__(self):
         self.map = {}
         self.count = 0
+
+    def set_window_action(self):
+        self.map[0] = {'action' : "window"}
 
     def add_action(self, node):
         self.count += 1
